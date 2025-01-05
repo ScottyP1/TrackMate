@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import User from '@/lib/models/User';
+import { dbConnect } from '@/lib/db'; // Import the dbConnect function
 
 // POST /api/auth/register
 export async function POST(req) {
     try {
+        // Connect to the database
+        await dbConnect(); // Ensure the database connection is established before handling the request
+
         console.log('Received request:', req);
         const { name, email, password, profileAvatar } = await req.json(); // Include profileAvatar
         console.log('Data extracted:', { name, email, profileAvatar });
