@@ -1,0 +1,134 @@
+@import 'swiper/css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100%;
+  background-image: linear-gradient(to bottom, #000000 10%, #0091ff);
+  overflow-x: hidden;
+  /* Prevent horizontal overflow */
+
+}
+
+@font-face {
+  font-family: 'cheeseFont';
+  src: url('/fonts/cheeseFont.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.cheesy {
+  font-family: 'cheeseFont', sans-serif;
+}
+
+/* Background Image for Home Page */
+.homeBG {
+  background-image:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.9)),
+    url('../public/images/homeBG.png');
+  background-size: cover;
+  background-position: 0% 20%;
+  background-repeat: no-repeat;
+  height: 100vh;
+  width: 100vw;
+
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    /* background-size: auto 60vh; */
+    /* Adjust to fit height */
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    /* Reduce height slightly for mobile */
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 1s ease-out;
+}
+
+/* Shadow Glow Effect */
+/* .shadow-glow {
+  text-shadow: 0 0 10px rgba(59, 130, 246, 0.2),
+    0 0 20px rgba(59, 130, 246, 0.2),
+    0 0 30px rgba(59, 130, 246, 0.2),
+    0 0 40px rgba(59, 130, 246, 0.2); */
+
+/* Mobile adjustments */
+/* @media (max-width: 768px) {
+    text-shadow: 0 0 5px rgba(59, 130, 246, 0.7),
+      0 0 10px rgba(59, 130, 246, 0.5),
+      0 0 15px rgba(59, 130, 246, 0.3),
+      0 0 20px rgba(59, 130, 246, 0.2);
+  } */
+/* } */
+
+/* Mobile-specific Utility Classes */
+@media (max-width: 768px) {
+  .cheesy {
+    font-size: 1.25rem;
+    /* Adjust font size for readability */
+    line-height: 1.5rem;
+  }
+
+  .homeBG {
+    padding: 1rem;
+    /* Add spacing for mobile screens */
+  }
+
+  .glow-effect {
+    box-shadow: 0 0 35px rgba(0, 140, 255, 0.7);
+    /* Blue glow */
+    transition: box-shadow 0.3s ease-in-out;
+  }
+}
+
+
+.glow-effect {
+  box-shadow: 0 0 15px rgba(0, 140, 255, 0.7);
+  /* Blue glow */
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.glow-effect:hover {
+  box-shadow: 0 0 35px rgba(0, 140, 255, 1);
+  /* Stronger blue glow on hover */
+}
+
+
+.current-page::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: -20px;
+  /* Adjust how much it overflows to the left */
+  right: -20px;
+  /* Adjust how much it overflows to the right */
+  height: 120%;
+  /* Adjust height to go beyond container */
+  transform: translateY(-20%) skew(10deg);
+  /* Slant the rectangle */
+  background-color: #3b82f6;
+  /* Blue background */
+  z-index: -1;
+  /* Push it behind the text */
+  border-radius: 5px;
+  /* Optional: rounded corners */
+}
