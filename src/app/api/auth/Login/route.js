@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
+import { dbConnect } from '@/lib/db'; // Import the dbConnect function
 
 import User from '@/lib/models/User';
 const bcrypt = require('bcrypt')
@@ -7,6 +8,7 @@ const bcrypt = require('bcrypt')
 // POST /api/auth/login
 export async function POST(req) {
     try {
+        await dbConnect(); // Ensure the database connection is established before handling the request
         const { email, password } = await req.json();
 
         // Validate input

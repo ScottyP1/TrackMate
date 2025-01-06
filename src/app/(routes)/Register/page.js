@@ -32,7 +32,6 @@ export default function Register() {
     };
 
     const onSelect = (avatar) => {
-        console.log(avatar)
         setData((prevData) => ({ ...prevData, profileAvatar: avatar.src })); // Save the image path directly
     };
 

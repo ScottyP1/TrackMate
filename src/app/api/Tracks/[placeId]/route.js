@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
 import Track from '@/lib/models/Track';
 import NotFound from '@/app/not-found';
+import { dbConnect } from '@/lib/db'; // Import the dbConnect function
 
 export async function GET(req, { params }) {
     const { placeId } = await params; // Track's placeID
 
     try {
+        await dbConnect(); // Ensure the database connection is established before handling the request
+
         // Fetch track details using placeID
         const track = await Track.findOne({ placeId }); // Query by placeID
 

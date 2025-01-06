@@ -1,6 +1,7 @@
 import Track from '@/lib/models/Track';
 import { NextResponse } from 'next/server';
 import axios from 'axios';
+import { dbConnect } from '@/lib/db'; // Import the dbConnect function
 
 // Geocoding function to get latitude and longitude from a zip code
 async function geocodeZipCode(zipCode) {
@@ -32,6 +33,8 @@ export async function GET(request) {
 
 
     try {
+        await dbConnect(); // Ensure the database connection is established before handling the request
+
         // If no zip code is provided, return the first 10 tracks from the database
         if (!zipCode) {
             const tracks = await Track.find().limit(12).lean(); // Fetch first 10 tracks from the database

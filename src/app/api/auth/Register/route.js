@@ -9,10 +9,7 @@ export async function POST(req) {
         // Connect to the database
         await dbConnect(); // Ensure the database connection is established before handling the request
 
-        console.log('Received request:', req);
         const { name, email, password, profileAvatar } = await req.json(); // Include profileAvatar
-        console.log('Data extracted:', { name, email, profileAvatar });
-
         // Create and save the user
         const user = new User({
             name,
@@ -20,13 +17,10 @@ export async function POST(req) {
             password,
             profileAvatar // Save avatar in the user model
         });
-        console.log('Saving user...');
         await user.save();
-        console.log('User saved:', user);
 
         // Generate JWT token
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-        console.log('JWT generated:', token);
 
         // Return success response
         return NextResponse.json({
