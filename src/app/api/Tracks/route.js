@@ -24,55 +24,61 @@ async function geocodeZipCode(zipCode) {
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const zipCode = searchParams.get('zipCode');
-    let radius = searchParams.get('radius'); // Ensure we fetch the radius parameter
+    let radius = searchParams.get('radius');
 
-    // If radius is not provided or is invalid, use the default value (50 miles)
+    // Ensure a valid radius is provided, otherwise use the default value
     if (!radius || isNaN(radius) || radius <= 0) {
-        radius = 50; // Default radius in miles if not provided or invalid
+        radius = 50;  // Default radius in miles
     }
 
+    // Validate the zip code format (must be 5 numeric digits)
+    if (zipCode && !/^\d{5}$/.test(zipCode)) {
+        return NextResponse.json({ message: 'Invalid zip code. Please provide a valid 5-digit zip code.' }, { status: 400 });
+    }
 
     try {
-        await dbConnect(); // Ensure the database connection is established before handling the request
+        await dbConnect();  // Ensure the database connection is established
 
-        // If no zip code is provided, return the first 10 tracks from the database
+        // If no zip code is provided, return the first 12 tracks from the database
         if (!zipCode) {
-            const tracks = await Track.find().limit(12).lean(); // Fetch first 10 tracks from the database
-            return NextResponse.json(tracks);
+            const tracks = await Track.find().limit(12).lean();
+            return NextResponse.json(tracks); // Return response immediately
         }
 
-        // Step 1: Get latitude and longitude of the user-provided zip code
+        // Get the latitude and longitude of the user-provided zip code
         const userLocation = await geocodeZipCode(zipCode);
         if (!userLocation) {
-            return NextResponse.json({ error: 'Invalid zip code' }, { status: 400 });
+            return NextResponse.json({ message: 'No tracks found in this area' }, { status: 200 }); // No geocoding result, but continue with empty result
         }
 
-        // Step 2: Convert radius to meters (miles to meters conversion: 1 mile = 1609.34 meters)
-        const radiusInMeters = radius * 1609.34; // Convert miles to meters
+        // Convert radius to meters (1 mile = 1609.34 meters)
+        const radiusInMeters = radius * 1609.34;
 
-        // Step 3: Query the database for tracks within the radius
+        // Query the database for tracks within the radius
         const tracks = await Track.find({
             coordinates: {
                 $near: {
                     $geometry: {
                         type: 'Point',
-                        coordinates: [userLocation.lng, userLocation.lat]  // [longitude, latitude]
+                        coordinates: userLocation
+                            ? [userLocation.lng, userLocation.lat]  // [longitude, latitude] if geocoding was successful
+                            : [0, 0]  // Default coordinates if geocoding failed (can adjust as needed)
                     },
                     $maxDistance: radiusInMeters  // Use radius in meters
                 }
             }
         }).lean();
 
-        // If no tracks are found, return a 404 response with an error message
+        // If no tracks are found, return a custom message
         if (tracks.length === 0) {
-            return NextResponse.json({ error: 'No tracks found within the specified radius' }, { status: 404 });
+            return NextResponse.json({ message: 'No tracks found in this area' }, { status: 200 }); // No tracks in area
         }
 
-        // Step 4: Return the tracks found
-        return NextResponse.json(tracks);
+        // If tracks are found, return them
+        return NextResponse.json(tracks); // Return the tracks found
+
     } catch (error) {
-        // Catch and log any errors
         console.error('Error fetching tracks:', error);
-        return NextResponse.json({ error: 'Failed to fetch tracks' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch tracks' }, { status: 500 }); // Handle unexpected errors
     }
 }

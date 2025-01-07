@@ -33,8 +33,8 @@ export default function LoginForm() {
     return (
         <div className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="text-black">
-                    <label htmlFor="email" className="block text-sm font-semibold text-gray-700">Email</label>
+                <div>
+                    <label htmlFor="email" className="block text-sm font-semibold text-white">Email</label>
                     <input
                         id="email"
                         name="email"
@@ -46,8 +46,8 @@ export default function LoginForm() {
                     />
                 </div>
 
-                <div className="text-black">
-                    <label htmlFor="password" className="block text-sm font-semibold text-gray-700">Password</label>
+                <div>
+                    <label htmlFor="password" className="block text-sm font-semibold text-white">Password</label>
                     <input
                         id="password"
                         name="password"

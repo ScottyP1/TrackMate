@@ -53,12 +53,18 @@ const fetchTracksByZipCode = (dispatch) => async (zipCode, radius) => {
         const response = await axiosInstance.get('/Tracks', {
             params: { zipCode, radius }  // Passing both zipCode and radius
         });
-
-        dispatch({ type: 'fetch_tracks', payload: response.data });
+        // If no tracks are found, we can check for an error message and dispatch it
+        if (response.data.error) {
+            dispatch({ type: 'add_error', payload: response.data.error });
+        } else {
+            dispatch({ type: 'fetch_tracks', payload: response.data });
+        }
     } catch (e) {
+        // If any other error occurs, dispatch a generic error
         dispatch({ type: 'add_error', payload: 'Failed to fetch tracks' });
     }
 };
+
 
 
 // Clear error messages

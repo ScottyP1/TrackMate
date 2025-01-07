@@ -41,11 +41,26 @@ export async function PATCH(req) {
             return new Response("Email and updates are required", { status: 400 });
         }
 
+        // Validate allowed fields
+        const allowedUpdates = ["name", "password"];
+        const keysToUpdate = Object.keys(updates);
+        const isValidUpdate = keysToUpdate.every((key) => allowedUpdates.includes(key));
+
+        if (!isValidUpdate) {
+            return new Response("Invalid fields in updates", { status: 400 });
+        }
+
+        // Hash the password if it is being updated
+        if (updates.password) {
+            const salt = await bcrypt.genSalt(10);
+            updates.password = await bcrypt.hash(updates.password, salt);
+        }
+
         // Update the user in the database
         const updatedUser = await User.findOneAndUpdate(
             { email },
             { $set: updates },
-            { new: true } // Return the updated document
+            { new: true, runValidators: true } // Ensure validation and return the updated document
         ).exec();
 
         if (!updatedUser) {

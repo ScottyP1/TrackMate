@@ -10,7 +10,6 @@ export default function Home() {
       <div className="absolute top-0 homeBG bg-cover bg-center"></div>
       <div className="relative px-4">
         <Header />
-
       </div>
     </div >
   );

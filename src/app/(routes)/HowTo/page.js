@@ -5,7 +5,7 @@ import { FaTruckPickup } from "react-icons/fa6";
 
 export default function HowTo() {
     return (
-        <div className="mt-24 text-center max-w-3xl mx-auto px-4 mx-12">
+        <div className="mt-24 text-center max-w-6xl mx-auto px-4 py-1 bg-black/[.5] rounded-lg ">
             <div className="mt-12">
                 <h2 className="text-4xl font-semibold ">Have a private track?</h2>
                 <p className="mx-2 text-xs ">Create an account or Login to submit your track for others to find</p>
@@ -42,7 +42,7 @@ export default function HowTo() {
                 <FaRoute className="text-6xl text-blue-500 mx-auto" /> {/* Mountain icon for selecting track */}
             </div>
 
-            <div className="mt-12 mb-8">
+            <div className="mt-12 mb-12">
                 <h1 className="text-3xl font-semibold ">Step 4</h1>
                 <div className="flex justify-center items-center gap-4">
                     <p className="text-lg tracking-[3px]">Load The Bike n Bark</p>

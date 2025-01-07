@@ -53,22 +53,40 @@ function NavBar() {
                         onClose={handleMenuClose}
                         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                         transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                        PaperProps={{
+                            style: {
+                                backgroundColor: '#000000', // Black background
+                                color: '#ffffff', // White text for contrast
+                                borderRadiusBottom: '8px', // Rounded corners
+                                marginTop: '4px', // Add spacing below the navbar
+
+                            },
+                        }}
                     >
                         {pages.map((page) => (
                             <Link key={page} href={getPagePath(page)} passHref>
-                                <MenuItem
-                                    onClick={handleMenuClose}
-                                    className={isActivePage(page) ? 'current-page' : ''}
-                                >
+                                <MenuItem onClick={handleMenuClose} className={isActivePage(page) ? 'current-page' : ''}>
                                     {page}
                                 </MenuItem>
                             </Link>
                         ))}
-                        <MenuItem onClick={handleMenuClose}>
-                            <a href="https://www.buymeacoffee.com/TrackMate">
-                                <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a RedBull&emoji=🤟🏻&slug=TrackMate&button_colour=5F7FFF&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00" />
+                        <MenuItem onClick={handleMenuClose} className="flex items-center justify-center">
+                            <a
+                                href="https://www.buymeacoffee.com/TrackMate"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block"
+                            >
+                                <img
+                                    src="https://img.buymeacoffee.com/button-api/?text=Buy me a RedBull&emoji=🤟🏻&slug=TrackMate&button_colour=5F7FFF&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00"
+                                    alt="Buy me a RedBull"
+                                    className="rounded-md"
+                                    width={200}
+                                    height={50}
+                                />
                             </a>
                         </MenuItem>
+
                     </Menu>
                 </Box>
 
@@ -107,7 +125,7 @@ function NavBar() {
                     </a>
                     {!state.token ? (
                         <Link href="/Login" passHref>
-                            <button className="text-white border border-blue-500 p-2 rounded-lg">Login</button>
+                            <button className="text-white w-[65px] bg-blue-500 hover:bg-blue-600 p-3 font-bold rounded-lg">Login</button>
                         </Link>
                     ) : (
                         <>
@@ -133,7 +151,7 @@ function NavBar() {
                     )}
                 </Box>
             </Toolbar>
-        </AppBar>
+        </AppBar >
     );
 }
 

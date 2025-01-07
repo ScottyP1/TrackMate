@@ -51,13 +51,13 @@ export default function Register() {
     };
 
     return (
-        <div className="mt-32 flex items-center justify-center bg-gray-100 rounded-lg">
-            <div className="bg-white p-8 rounded-lg shadow-xl w-96">
+        <div className="mt-24 flex items-center justify-center rounded-lg">
+            <div className="bg-black/[.8]  p-8 rounded-lg shadow-xl w-96">
                 <h1 className="text-3xl font-bold text-center mb-8 text-blue-600">Register</h1>
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6 ">
                     {/* Name Field */}
-                    <div className="text-black">
-                        <label htmlFor="name" className="block text-sm font-semibold text-gray-700">
+                    <div>
+                        <label htmlFor="name" className="block text-sm font-semibold text-white">
                             Name
                         </label>
                         <input
@@ -71,8 +71,8 @@ export default function Register() {
                         />
                     </div>
                     {/* Email Field */}
-                    <div className="text-black">
-                        <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
+                    <div>
+                        <label htmlFor="email" className="block text-sm font-semibold text-white">
                             Email
                         </label>
                         <input
@@ -86,8 +86,8 @@ export default function Register() {
                         />
                     </div>
                     {/* Password Field */}
-                    <div className="text-black">
-                        <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
+                    <div>
+                        <label htmlFor="password" className="block text-sm font-semibold text-white">
                             Password
                         </label>
                         <input
@@ -102,7 +102,7 @@ export default function Register() {
                     </div>
                     {/* Avatar Selection */}
                     <div>
-                        <h1 className="text-black text-center">Select your Avatar</h1>
+                        <h1 className="text-white text-center mb-4">Select your Avatar</h1>
                         <AvatarList onSelect={onSelect} />
                     </div>
                     {/* Error Message */}
@@ -118,7 +118,7 @@ export default function Register() {
                         </button>
                     </div>
                 </form>
-                <p className="text-black text-sm mt-2">
+                <p className="text-white text-sm mt-2">
                     Already have an account? Click{' '}
                     <a href="/Login" className="text-blue-600 hover:underline">
                         here

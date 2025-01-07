@@ -16,7 +16,7 @@ export const TrackCard = ({ track }) => {
     const imageUrl = getValidImageUrl(track.images);
     return (
         <Link href={`/Tracks/${track.placeId}`} className="block">
-            <div className="bg-gray-800 rounded-md overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-blue-500 hover:-translate-y-4 transition-transform">
+            <div className=" bg-gray-800 rounded-md overflow-hidden shadow-lg lg:hover:shadow-2xl lg:hover:shadow-blue-500 lg:hover:-translate-y-4 lg:transition-transform">
                 <img
                     src={imageUrl}
                     alt={track.name || 'Track Image'}
@@ -34,6 +34,6 @@ export const TrackCard = ({ track }) => {
                     </p>
                 </div>
             </div>
-        </Link>
+        </Link >
     );
 };

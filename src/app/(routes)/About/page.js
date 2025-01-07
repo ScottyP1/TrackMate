@@ -1,6 +1,6 @@
 export default function About() {
     return (
-        <div className="max-w-4xl mt-24 mx-auto px-6 relative mb-12">
+        <div className="max-w-4xl mt-24 mx-auto px-6 relative bg-black/[.5] rounded-lg p-12">
             {/* Top-left blue border */}
             <div className="absolute top-0 left-5 md:left-0 w-8 h-8 border-t-4 border-l-4 border-blue-500"></div>
             {/* Bottom-right blue border */}
@@ -20,7 +20,7 @@ export default function About() {
                 Not only can you discover tracks, but you can also connect with others by reading and leaving comments on track pages. Share your experience, tips, and thoughts with the community, helping others enjoy their adventures. You can even submit your own private track for others to find, expanding our community and helping everyone enjoy the outdoors together.
             </p>
             <h2 className="text-3xl font-semibold mb-4">Join Us</h2>
-            <p className="text-lg">
+            <p className="text-lg mb-12">
                 Ready to explore the best tracks near you? Sign up today to get started, or log in to submit your own track and share your experiences with others. Whether you're a seasoned adventurer or a beginner, there's always a new track to discover with TrackMate.
             </p>
         </div>

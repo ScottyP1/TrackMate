@@ -26,14 +26,15 @@ export default function Account() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            await updateUser({ email: state.userEmail, updates: formData });
-            setMessage('Profile updated successfully!');
-        } catch (err) {
-            console.error(err);
-            setMessage('Failed to update profile.');
-        }
+        // try {
+        //     await updateUser({ email: state.userEmail, updates: formData });
+        //     setMessage("Profile updated successfully!");
+        // } catch (err) {
+        //     console.error(err);
+        //     setMessage(err.response?.data || "Failed to update profile.");
+        // }
     };
+
 
     if (state.loading) {
         return <div className="mt-24 text-white text-center">Loading...</div>;

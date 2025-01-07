@@ -78,16 +78,19 @@ const fetchUser = (dispatch) => async (email) => {
 
 
 const updateUser = (dispatch) => async ({ email, updates }) => {
-    dispatch({ type: 'set_loading', payload: true });
+    dispatch({ type: "set_loading", payload: true });
     try {
-        const response = await axiosInstance.patch('/Account', { email, updates });
+        const response = await axiosInstance.patch("/Account", { email, updates });
         const updatedUser = response.data.user;
-        dispatch({ type: 'add_user', payload: updatedUser }); // Update user in state
+        dispatch({ type: "fetch_user", payload: updatedUser }); // Update user in state
     } catch (error) {
         console.error("Error updating user:", error);
-        dispatch({ type: 'add_error', payload: 'Failed to update user data.' });
+
+        const errorMessage =
+            error.response?.data || "Failed to update user data. Please try again.";
+        dispatch({ type: "add_error", payload: errorMessage });
     } finally {
-        dispatch({ type: 'set_loading', payload: false });
+        dispatch({ type: "set_loading", payload: false });
     }
 };
 
