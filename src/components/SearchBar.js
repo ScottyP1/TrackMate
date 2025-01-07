@@ -15,7 +15,7 @@ export default function SearchBar({ onSearch }) {
 
 
     return (
-        <form onSubmit={handleSubmit} className="flex items-center w-1/2 justify-center mx-auto min-w-[880px]">
+        <form onSubmit={handleSubmit} className="flex items-center w-1/2 justify-center mx-auto min-w-[300px] md:min-w-[880px]">
             <FaSearchLocation
                 className="absolute left-[30px] md:left-[325px] 2xl:left-[530px] text-white"
                 size={30}
