@@ -3,16 +3,15 @@ import { useState } from 'react';
 import { FaSearchLocation } from 'react-icons/fa';
 
 export default function SearchBar({ onSearch }) {
-    const [zipCode, setZipCode] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
     const [radius, setRadius] = useState('10'); // State for radius
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (zipCode && radius) {
-            onSearch(zipCode, Number(radius));  // Ensure it's being passed as a number
+        if (searchTerm) {
+            onSearch(searchTerm, Number(radius));  // Pass searchTerm (which could be zip code or track name)
         }
     };
-
 
     return (
         <form onSubmit={handleSubmit} className="flex items-center w-1/2 justify-center mx-auto min-w-[300px] md:min-w-[880px]">
@@ -22,10 +21,10 @@ export default function SearchBar({ onSearch }) {
             />
             <input
                 type="text"
-                value={zipCode}
-                onChange={(e) => setZipCode(e.target.value)}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="flex-grow w-[300px] rounded-r-[0px] rounded-l-lg bg-gray-800 placeholder:text-md md:placeholder:text-lg text-white p-3 pl-12 placeholder-white focus:outline-none focus:ring-2 focus:ring-blue-300 border-r-0"
-                placeholder="Enter zip code"
+                placeholder="Enter track name or zip code"
                 aria-label="Search for a track"
             />
             <select
@@ -47,6 +46,5 @@ export default function SearchBar({ onSearch }) {
                 Go
             </button>
         </form>
-
     );
 }

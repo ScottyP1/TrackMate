@@ -1,46 +1,60 @@
 'use client'
 import { useEffect, useContext, useState } from 'react';
 import { Context as TrackContext } from '@/context/TrackContext';
-import { TrackCard } from '@/components/Track/TrackCard'; // Import TrackCard component
+import { TrackCard } from '@/components/Track/TrackCard';
 import SearchBar from '@/components/SearchBar';
+import DOMPurify from 'dompurify';
 
 export default function Tracks() {
-    const { state, fetchAllTracks, loading, errorMessage, fetchTracksByZipCode } = useContext(TrackContext);
+    // Destructure the necessary values and functions from the context
+    const { state, fetchTracks, handleInvalidZipCode, loading, errorMessage } = useContext(TrackContext);
+
+    // Local state to hold zipCode and radius from the search bar input
     const [zipCode, setZipCode] = useState('');
     const [radius, setRadius] = useState('');
 
-    useEffect(() => {
-        fetchAllTracks(); // Automatically fetch all tracks when component mounts (initial load)
-    }, []);
-
     const handleSearch = async (zip, radius) => {
-        setZipCode(zip);
-        setRadius(radius); // Set radius in state
-        await fetchTracksByZipCode(zip, radius); // Trigger fetching filtered tracks by zip code and radius
+        // Sanitize inputs
+        const sanitizedZip = DOMPurify.sanitize(zip);
+        const sanitizedRadius = DOMPurify.sanitize(radius);
+
+        // If zip code is invalid, clear the tracks and set the error via context
+        if (!/^\d{5}$/.test(sanitizedZip)) {
+            handleInvalidZipCode();  // Handle invalid zip code via context
+        }
+
+        // Set local state for zipCode and radius
+        setZipCode(sanitizedZip);
+        setRadius(sanitizedRadius);
+
+        // Fetch tracks
+        fetchTracks(sanitizedZip, sanitizedRadius); // Dispatch action to fetch tracks
     };
 
     return (
         <div className="track-list p-4 mt-24">
-            {/* Search Bar Container with fixed width */}
-            <div className="w-full min-w-xl mx-auto mb-4"> {/* max-width for container */}
-                <SearchBar onSearch={handleSearch} />
+            <div className="w-full min-w-xl mx-auto mb-4">
+                <SearchBar onSearch={handleSearch} />  {/* Search bar to trigger search */}
             </div>
 
+            {/* Loading indicator */}
             {loading && <p>Loading...</p>}
 
-            {/* Display specific error messages */}
+            {/* Error message */}
             {errorMessage && (
                 <p className="text-center text-lg text-red-500 mt-4">{errorMessage}</p>
             )}
 
-            {/* Render the tracks */}
+            {/* Display tracks */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 mt-12">
                 {state.tracks.length > 0 ? (
                     state.tracks.map((track) => (
-                        <TrackCard key={track._id} track={track} /> // Render TrackCard component
+                        <TrackCard key={track._id} track={track} />
                     ))
                 ) : (
-                    <p className="text-center text-lg col-span-full">No tracks found in your area. Please try a different zip code.</p>
+                    !loading && (
+                        <p className="text-center text-lg col-span-full">No tracks found with the given name or zip code. Please try again.</p>
+                    )
                 )}
             </div>
         </div>
