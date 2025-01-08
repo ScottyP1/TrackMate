@@ -1,3 +1,4 @@
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 import NavBar from "../components/NavBar";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <TrackProvider>
             <AppRouterCacheProvider>
+              <SpeedInsights />
               <div className="text-white items-center justify-items-center min-h-screen">
                 <NavBar />
                 {children}
