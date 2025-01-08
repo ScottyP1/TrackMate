@@ -1,22 +1,23 @@
 'use client';
 
 import { useContext, useState, useEffect } from "react";
-import { useRouter } from 'next/navigation';  // Import from 'next/navigation'
+import { useRouter } from 'next/navigation';
 import { Context as AuthContext } from '@/context/AuthContext';
+import { HiEye, HiEyeOff } from 'react-icons/hi'; // Add the eye icon library for visibility toggle
 
 export default function LoginForm() {
     const [data, setData] = useState({ email: '', password: '' });
-    const { state, signIn, clearError } = useContext(AuthContext);  // Access state for error handling
-    const router = useRouter(); // Use useRouter from 'next/navigation'
+    const [passwordVisible, setPasswordVisible] = useState(false); // State to toggle password visibility
+    const { state, signIn, clearError } = useContext(AuthContext);
+    const router = useRouter();
 
     useEffect(() => {
         clearError();
     }, []);
 
-    // Redirect if the token is set
     useEffect(() => {
         if (state.token) {
-            router.push('/'); // Redirect to homepage after successful login
+            router.push('/');
         }
     }, [state.token, router]);
 
@@ -30,10 +31,14 @@ export default function LoginForm() {
         signIn({ email: data.email, password: data.password });
     };
 
+    const togglePasswordVisibility = () => {
+        setPasswordVisible((prev) => !prev); // Toggle password visibility
+    };
+
     return (
         <div className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
+                <div className="text-black">
                     <label htmlFor="email" className="block text-sm font-semibold text-white">Email</label>
                     <input
                         id="email"
@@ -46,20 +51,26 @@ export default function LoginForm() {
                     />
                 </div>
 
-                <div>
+                <div className="text-black relative">
                     <label htmlFor="password" className="block text-sm font-semibold text-white">Password</label>
                     <input
                         id="password"
                         name="password"
-                        type="password"
+                        type={passwordVisible ? "text" : "password"}
                         placeholder="Enter your password"
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-12"  // Ensure padding-right for icon
                         value={data.password}
                         onChange={handleChange}
                     />
+                    <button
+                        type="button"
+                        className="absolute right-3 top-[43px] transform -translate-y-1/2"  // Adjust vertical centering
+                        onClick={togglePasswordVisibility}
+                    >
+                        {passwordVisible ? <HiEyeOff size={24} /> : <HiEye size={24} />}
+                    </button>
                 </div>
 
-                {/* Display error message if login fails */}
                 {state.errorMessage && (
                     <div className="text-red-500 text-center">
                         {state.errorMessage}

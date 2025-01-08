@@ -3,6 +3,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Context as AuthContext } from '@/context/AuthContext';
+import { HiEye, HiEyeOff } from 'react-icons/hi'; // Add the eye icon library for visibility toggle
 
 import AvatarList from '@/components/AvatarList';
 
@@ -14,6 +15,7 @@ export default function Register() {
         password: '',
         profileAvatar: '',
     });
+    const [passwordVisible, setPasswordVisible] = useState(false); // State to toggle password visibility
     const router = useRouter();
 
     useEffect(() => {
@@ -35,7 +37,6 @@ export default function Register() {
         setData((prevData) => ({ ...prevData, profileAvatar: avatar.src })); // Save the image path directly
     };
 
-
     const handleSubmit = async (evt) => {
         evt.preventDefault();
         try {
@@ -50,13 +51,17 @@ export default function Register() {
         }
     };
 
+    const togglePasswordVisibility = () => {
+        setPasswordVisible((prev) => !prev); // Toggle password visibility
+    };
+
     return (
         <div className="mt-24 flex items-center justify-center rounded-lg">
-            <div className="bg-black/[.8]  p-8 rounded-lg shadow-xl w-96">
+            <div className="bg-black/[.8] p-8 rounded-lg shadow-xl w-96">
                 <h1 className="text-3xl font-bold text-center mb-8 text-blue-600">Register</h1>
-                <form onSubmit={handleSubmit} className="space-y-6 ">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Name Field */}
-                    <div>
+                    <div className="text-black">
                         <label htmlFor="name" className="block text-sm font-semibold text-white">
                             Name
                         </label>
@@ -70,8 +75,9 @@ export default function Register() {
                             onChange={handleChange}
                         />
                     </div>
+
                     {/* Email Field */}
-                    <div>
+                    <div className="text-black">
                         <label htmlFor="email" className="block text-sm font-semibold text-white">
                             Email
                         </label>
@@ -85,26 +91,36 @@ export default function Register() {
                             onChange={handleChange}
                         />
                     </div>
+
                     {/* Password Field */}
-                    <div>
+                    <div className="text-black relative">
                         <label htmlFor="password" className="block text-sm font-semibold text-white">
                             Password
                         </label>
                         <input
                             id="password"
                             name="password"
-                            type="password"
+                            type={passwordVisible ? 'text' : 'password'} // Toggle input type based on state
                             placeholder="Enter your password"
-                            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-12" // Added padding-right for icon
                             value={data.password}
                             onChange={handleChange}
                         />
+                        <button
+                            type="button"
+                            className="absolute right-3 top-[43px] transform -translate-y-1/2"
+                            onClick={togglePasswordVisibility}
+                        >
+                            {passwordVisible ? <HiEyeOff size={24} /> : <HiEye size={24} />}
+                        </button>
                     </div>
+
                     {/* Avatar Selection */}
                     <div>
                         <h1 className="text-white text-center mb-4">Select your Avatar</h1>
                         <AvatarList onSelect={onSelect} />
                     </div>
+
                     {/* Error Message */}
                     <div>
                         {state.errorMessage && (
