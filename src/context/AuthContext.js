@@ -1,7 +1,9 @@
 'use client'
+
 import createDataContext from "@/context/createDataContext";
 import axiosInstance from "@/api/axios";
 
+// Define the reducer to handle state updates
 const authReducer = (state, action) => {
     switch (action.type) {
         case 'add_error':
@@ -35,11 +37,19 @@ const authReducer = (state, action) => {
                 userEmail: ''
             };
 
+        case 'update_favorites':
+            return {
+                ...state,
+                user: {
+                    ...state.user,
+                    favorites: action.payload // Update the favorites list directly
+                }
+            };
+
         default:
             return state;
     }
 };
-
 
 // Clear any error before making a request
 const clearError = (dispatch) => () => {
@@ -57,15 +67,29 @@ const loadToken = (dispatch) => () => {
     }
 };
 
+const updateFavorites = (dispatch) => async (email, favorites) => {
+    dispatch({ type: 'set_loading', payload: true });
+    try {
+        const response = await axiosInstance.patch("/Account", { email, updates: { favorites } });
+        const updatedUser = response.data.user;
+        dispatch({ type: 'update_favorites', payload: updatedUser.favorites }); // Update the favorites in the state
+    } catch (error) {
+        console.error("Error updating favorites:", error);
+        dispatch({ type: 'add_error', payload: "Failed to update favorites." });
+    } finally {
+        dispatch({ type: 'set_loading', payload: false });
+    }
+};
+
 const fetchUser = (dispatch) => async (email) => {
     dispatch({ type: 'set_loading', payload: true });
     try {
         const response = await axiosInstance.get(`/Account?email=${email}`);
         const user = response.data.user;
-        dispatch({ type: 'fetch_user', payload: user });
+        dispatch({ type: 'fetch_user', payload: { ...user, favorites: user.favorites || [] } });
 
         // Optionally save the avatar in localStorage if not already there
-        if (user.avatar && !localStorage.getItem('userAvatar')) {
+        if (user.avatar && !localStorage.getItem('profileAvatar')) {
             localStorage.setItem('profileAvatar', user.avatar);
         }
     } catch (error) {
@@ -75,7 +99,6 @@ const fetchUser = (dispatch) => async (email) => {
         dispatch({ type: 'set_loading', payload: false });
     }
 };
-
 
 const updateUser = (dispatch) => async ({ email, updates }) => {
     dispatch({ type: "set_loading", payload: true });
@@ -93,7 +116,6 @@ const updateUser = (dispatch) => async ({ email, updates }) => {
         dispatch({ type: "set_loading", payload: false });
     }
 };
-
 
 const register = (dispatch) => async ({ name, email, password, profileAvatar }) => {
     dispatch({ type: 'clear_error' });
@@ -117,7 +139,6 @@ const register = (dispatch) => async ({ name, email, password, profileAvatar }) 
         dispatch({ type: 'set_loading', payload: false });
     }
 };
-
 
 const signIn = (dispatch) => async ({ email, password }) => {
     dispatch({ type: 'set_loading', payload: true });
@@ -144,19 +165,16 @@ const signIn = (dispatch) => async ({ email, password }) => {
     }
 };
 
-
-
-
 const signOut = (dispatch) => () => {
-    console.log('Sign out called')
     localStorage.removeItem('authToken'); // Remove token from localStorage
     localStorage.removeItem('userEmail'); // Remove email from localStorage
     localStorage.removeItem('profileAvatar'); // Remove avatar from localStorage
+    localStorage.removeItem('zip',);
     dispatch({ type: 'sign_out' }); // Update state to reflect user is logged out
 };
 
 export const { Provider, Context } = createDataContext(
     authReducer,
-    { register, signIn, signOut, clearError, loadToken, fetchUser, updateUser }, // Export clearError as well
-    { token: null, userEmail: '', user: null, errorMessage: '', loading: false }
+    { register, signIn, signOut, clearError, loadToken, fetchUser, updateUser, updateFavorites }, // Export all actions
+    { token: null, userEmail: '', user: null, favorites: [], errorMessage: '', loading: false }
 );

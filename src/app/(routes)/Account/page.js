@@ -1,54 +1,38 @@
-"use client";
-
+'use client'
 import { useState, useEffect, useContext } from "react";
-import { useRouter } from "next/navigation"; // Import the useRouter hook
+import { useRouter } from "next/navigation";
 import { Context as AuthContext } from "@/context/AuthContext";
+import { Context as TrackContext } from "@/context/TrackContext";
+import { TrackCard } from "@/components/Track/TrackCard";
 
 export default function Account() {
-    const { state, fetchUser, updateUser } = useContext(AuthContext);
+    const { state: authState } = useContext(AuthContext);
+    const { state: trackState, fetchFavoriteTracks } = useContext(TrackContext);
     const [formData, setFormData] = useState({ name: '', email: '' });
     const [message, setMessage] = useState('');
-    const router = useRouter(); // Use the new router hook
 
     useEffect(() => {
-        if (state.userEmail && !state.user) {
-            fetchUser(state.userEmail);
-        } else if (state.user) {
-            setFormData({ name: state.user.name, email: state.user.email });
+        if (authState.user) {
+            setFormData({ name: authState.user.name, email: authState.user.email });
         }
-    }, [state.userEmail, state.user]);
+    }, [authState.user]);
 
+    // Fetch favorite tracks only if favorites are available and tracks haven't been fetched yet
     useEffect(() => {
-        if (!state.user && !state.loading) {
-            router.push('/Login'); // Redirect to the login page if the user is not logged in
+        if (authState.user && authState.user.favorites && authState.user.favorites.length > 0) {
+            // Only fetch if favoriteTracks are not already fetched
+            if (trackState.favoriteTracks.length === 0) {
+                fetchFavoriteTracks(authState.user.favorites);
+            }
         }
-    }, [state.user, state.loading]);
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        // try {
-        //     await updateUser({ email: state.userEmail, updates: formData });
-        //     setMessage("Profile updated successfully!");
-        // } catch (err) {
-        //     console.error(err);
-        //     setMessage(err.response?.data || "Failed to update profile.");
-        // }
-    };
-
-
-    if (state.loading) {
-        return <div className="mt-24 text-white text-center">Loading...</div>;
-    }
-
-    if (state.errorMessage) {
-        return <div className="mt-24 text-red-500">{state.errorMessage}</div>;
-    }
+    }, [authState.user]);
 
     return (
-        <div className="mt-24">
+        <div className="mt-24 p-4">
             <h1 className="text-white text-center">Account</h1>
             <div className="text-center text-green-500">{message}</div>
-            <form onSubmit={handleSubmit} className="text-white">
+
+            <form className="text-white">
                 <label className="block">
                     Name:
                     <input
@@ -65,7 +49,7 @@ export default function Account() {
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         className="block w-full mt-2 p-2 bg-gray-800 text-white"
-                        disabled // Email should not be editable
+                        disabled
                     />
                 </label>
                 <button
@@ -75,6 +59,20 @@ export default function Account() {
                     Update Profile
                 </button>
             </form>
+
+            <div className="mt-8">
+                <h2 className="text-white text-center">Your Favorite Tracks</h2>
+
+                {trackState.favoriteTracks.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
+                        {trackState.favoriteTracks.map((track) => (
+                            <TrackCard key={track.id} track={track} />
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-white text-center mt-4">You don't have any favorite tracks yet.</p>
+                )}
+            </div>
         </div>
     );
 }

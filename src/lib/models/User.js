@@ -6,7 +6,9 @@ const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    profileAvatar: { type: String, default: '' }, // Add the profile image field
+    profileAvatar: { type: String, default: '' },
+    favorites: { type: [String], default: [] } // New field for storing favorite track ids
+
 });
 
 // Hash the password before saving the user

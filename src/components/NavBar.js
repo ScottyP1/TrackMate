@@ -21,11 +21,20 @@ const pages = ['Home', 'Tracks', 'About', 'HowTo'];
 function NavBar() {
     const [menuAnchor, setMenuAnchor] = React.useState(null);
     const [userMenuAnchor, setUserMenuAnchor] = React.useState(null);
+    const [userAvatar, setUserAvatar] = React.useState(null);  // State to store avatar URL
     const { state, loadToken, signOut, fetchUser } = React.useContext(AuthContext);
     const pathname = usePathname();
 
     React.useEffect(() => {
         loadToken();
+
+        // Check local storage for avatar, if exists, use it, otherwise use default
+        const avatarFromLocalStorage = localStorage.getItem('profileAvatar');
+        if (avatarFromLocalStorage) {
+            setUserAvatar(avatarFromLocalStorage);  // Set avatar from localStorage
+        } else {
+            setUserAvatar(defaultAvatar);  // Use default avatar if none found
+        }
 
         if (state.token && state.userEmail && !state.user) {
             fetchUser(state.userEmail);
@@ -39,6 +48,7 @@ function NavBar() {
 
     const getPagePath = (page) => (page === 'Home' ? '/' : `/${page}`);
     const isActivePage = (page) => pathname === getPagePath(page);
+
     return (
         <AppBar position="fixed" sx={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', zIndex: 10 }}>
             <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 65, px: 2 }}>
@@ -59,7 +69,6 @@ function NavBar() {
                                 color: '#ffffff', // White text for contrast
                                 borderRadiusBottom: '8px', // Rounded corners
                                 marginTop: '4px', // Add spacing below the navbar
-
                             },
                         }}
                     >
@@ -78,7 +87,7 @@ function NavBar() {
                                 className="block"
                             >
                                 <img
-                                    src="https://img.buymeacoffee.com/button-api/?text=Buy me a RedBull&emoji=🤟🏻&slug=TrackMate&button_colour=5F7FFF&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00"
+                                    src="https://img.buymeacoffee.com/button-api/?text=BuymeaRedBull&emoji=🤟🏻&slug=TrackMate&button_colour=5F7FFF&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00"
                                     alt="Buy me a RedBull"
                                     className="rounded-md"
                                     width={200}
@@ -86,7 +95,6 @@ function NavBar() {
                                 />
                             </a>
                         </MenuItem>
-
                     </Menu>
                 </Box>
 
@@ -130,7 +138,7 @@ function NavBar() {
                     ) : (
                         <>
                             <IconButton onClick={handleUserMenuOpen} color="inherit">
-                                <Avatar alt={state.user?.name || 'User'} src={state.user?.profileAvatar || defaultAvatar} />
+                                <Avatar alt={state.user?.name || 'User'} src={userAvatar} />
                             </IconButton>
                             <Menu
                                 anchorEl={userMenuAnchor}

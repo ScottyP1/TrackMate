@@ -1,6 +1,6 @@
 export default function About() {
     return (
-        <div className="max-w-4xl mt-24 mx-auto px-6 relative bg-black/[.5] rounded-lg p-12">
+        <div className="max-w-4xl mt-24 mx-auto relative bg-black/[.5] rounded-lg p-12">
             {/* Top-left blue border */}
             <div className="absolute top-0 left-5 md:left-0 w-8 h-8 border-t-4 border-l-4 border-blue-500"></div>
             {/* Bottom-right blue border */}

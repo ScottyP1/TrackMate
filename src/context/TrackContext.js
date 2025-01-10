@@ -12,6 +12,8 @@ const trackReducer = (state, action) => {
             return { ...state, radius: action.payload };
         case 'fetch_tracks':
             return { ...state, tracks: action.payload, loading: false };
+        case 'fetch_favorite_tracks':
+            return { ...state, favoriteTracks: action.payload, loading: false };  // Store favorite tracks separately
         case 'fetch_track':
             return { ...state, track: action.payload, loading: false };
         case 'add_error':
@@ -19,8 +21,8 @@ const trackReducer = (state, action) => {
         case 'clear_error':
             return { ...state, errorMessage: '' };
         case 'clear_tracks':
-            return { ...state, tracks: [] };
-        case 'handle_invalid_zip_code':  // Handle invalid zip code error
+            return { ...state, tracks: [], favoriteTracks: [] };  // Clear both tracks and favorite tracks
+        case 'handle_invalid_zip_code':
             return { ...state, tracks: [], errorMessage: 'Invalid zip code. Please try again.', loading: false };
         case 'set_loading':
             return { ...state, loading: action.payload };
@@ -28,6 +30,7 @@ const trackReducer = (state, action) => {
             return state;
     }
 };
+
 
 // Fetch all tracks (to be called once when the app loads or on mount)
 // trackContext.js (updated fetchTracks method)
@@ -48,10 +51,25 @@ const fetchTrackById = (dispatch) => async (placeId) => {
     try {
         let response = await axiosInstance.get(`/Tracks/${placeId}`);
         dispatch({ type: 'fetch_track', payload: response.data });
+        return response.data;  // Return the track data
     } catch (e) {
         dispatch({ type: 'add_error', payload: 'Failed to fetch track' });
     }
 };
+
+const fetchFavoriteTracks = (dispatch) => async (trackIds) => {
+    dispatch({ type: 'set_loading', payload: true });
+    try {
+        const trackPromises = trackIds.map(trackId => fetchTrackById(dispatch)(trackId));
+        const trackData = await Promise.all(trackPromises);
+        // Dispatch the fetched favorite tracks to the favoriteTracks state
+        dispatch({ type: 'fetch_favorite_tracks', payload: trackData });
+    } catch (error) {
+        console.error('Error fetching favorite tracks:', error);
+        dispatch({ type: 'add_error', payload: 'Failed to fetch favorite tracks' });
+    }
+};
+
 
 const fetchTracks = (dispatch) => async (searchTerm = '', radius = 10) => {
     dispatch({ type: 'set_loading', payload: true });
@@ -92,8 +110,6 @@ const fetchTracks = (dispatch) => async (searchTerm = '', radius = 10) => {
     }
 };
 
-
-
 const clearTracks = (dispatch) => () => {
     dispatch({ type: 'clear_tracks' });
 };
@@ -104,8 +120,20 @@ const clearError = (dispatch) => () => {
 const handleInvalidZipCode = (dispatch) => () => {
     dispatch({ type: 'handle_invalid_zip_code' });
 };
+const setZipCode = (dispatch) => (zipCode) => {
+    localStorage.setItem('zip', zipCode);
+    dispatch({ type: 'set_zip_code', payload: zipCode });
+};
+
+const setRadius = (dispatch) => (radius) => {
+    dispatch({ type: 'set_radius', payload: radius });
+};
+
 export const { Provider, Context } = createDataContext(
     trackReducer,
-    { fetchAllTracks, fetchTrackById, fetchTracks, clearTracks, clearError, handleInvalidZipCode },
-    { tracks: [], track: null, zipCode: null, radius: null, errorMessage: '', loading: false }
+    { setZipCode, setRadius, fetchAllTracks, fetchTrackById, fetchFavoriteTracks, fetchTracks, clearTracks, clearError, handleInvalidZipCode },
+    {
+        tracks: [], favoriteTracks: [],
+        track: null, zipCode: null, radius: null, errorMessage: '', loading: false
+    }
 );
