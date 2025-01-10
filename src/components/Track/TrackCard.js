@@ -1,42 +1,11 @@
-'use client'
-
-import { useState, useEffect, useContext } from 'react';
-import { Context as AuthContext } from '@/context/AuthContext';  // Ensure this is imported correctly for client-side use
+// components/TrackCard.js
+import { useFavorite } from '@/hooks/useFavorite';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
 import Link from 'next/link';
 
 export const TrackCard = ({ track }) => {
-    const { state, updateUser } = useContext(AuthContext);  // Use the client-side context
-    const [isFavorite, setIsFavorite] = useState(false);
+    const { isFavorite, handleFavoriteClick } = useFavorite(track.placeId);
     const router = useRouter();
-
-    useEffect(() => {
-        if (state.user && state.user.favorites) {
-            setIsFavorite(state.user.favorites.includes(track.placeId));
-        }
-    }, [state.user, track.placeId]);
-
-    const handleFavoriteClick = async () => {
-        const token = localStorage.getItem('authToken');
-        const userEmail = localStorage.getItem('userEmail');
-
-        if (!token) {
-            router.push('/Login'); // Redirect to login if no token
-            return;
-        }
-
-        try {
-            const newFavorites = isFavorite
-                ? state.user.favorites.filter(fav => fav !== track.placeId)
-                : [...state.user.favorites, track.placeId];
-
-            await updateUser({ email: userEmail, updates: { favorites: newFavorites } });
-            setIsFavorite(!isFavorite);
-        } catch (error) {
-            console.error('Failed to update favorites', error);
-        }
-    };
 
     return (
         <div className="bg-gray-800 rounded-md overflow-hidden shadow-lg lg:hover:shadow-2xl lg:hover:shadow-blue-500">
@@ -63,7 +32,6 @@ export const TrackCard = ({ track }) => {
                         {isFavorite ? '❤️' : '🤍'}
                     </span>
                 </div>
-
             </div>
         </div>
     );

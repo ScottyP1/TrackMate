@@ -13,33 +13,34 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Image from 'next/image';
 import Avatar from '@mui/material/Avatar';
 import logo from '@/public/images/logo.png';
-import defaultAvatar from '@/public/Avatars/default-avatar.png';
 import { Context as AuthContext } from '@/context/AuthContext';
+import Cookies from 'js-cookie';
 
 const pages = ['Home', 'Tracks', 'About', 'HowTo'];
 
 function NavBar() {
     const [menuAnchor, setMenuAnchor] = React.useState(null);
     const [userMenuAnchor, setUserMenuAnchor] = React.useState(null);
-    const [userAvatar, setUserAvatar] = React.useState(null);  // State to store avatar URL
-    const { state, loadToken, signOut, fetchUser } = React.useContext(AuthContext);
+    const [userAvatar, setUserAvatar] = React.useState('');  // Default avatar
+    const { state, loadTokenAndUser, signOut } = React.useContext(AuthContext);
     const pathname = usePathname();
 
+    // Load user avatar from cookies and context on initial render
     React.useEffect(() => {
-        loadToken();
+        // Check if avatar exists in cookies (use it only if the context doesn't have it yet)
+        const avatarFromCookies = Cookies.get('profileAvatar');
 
-        // Check local storage for avatar, if exists, use it, otherwise use default
-        const avatarFromLocalStorage = localStorage.getItem('profileAvatar');
-        if (avatarFromLocalStorage) {
-            setUserAvatar(avatarFromLocalStorage);  // Set avatar from localStorage
+        if (avatarFromCookies && state.user?.avatar !== avatarFromCookies) {
+            setUserAvatar(avatarFromCookies);
         } else {
-            setUserAvatar(defaultAvatar);  // Use default avatar if none found
+            setUserAvatar(state.user?.avatar || '/Avatars/default-avatar.png');
         }
 
-        if (state.token && state.userEmail && !state.user) {
-            fetchUser(state.userEmail);
+        // Load user and token from cookies if not already loaded (to avoid redundant calls)
+        if (!state.token) {
+            loadTokenAndUser();
         }
-    }, [state.token, state.userEmail, state.user]);
+    }, [state.user, loadTokenAndUser]);
 
     const handleMenuOpen = (event) => setMenuAnchor(event.currentTarget);
     const handleMenuClose = () => setMenuAnchor(null);
@@ -159,7 +160,7 @@ function NavBar() {
                     )}
                 </Box>
             </Toolbar>
-        </AppBar >
+        </AppBar>
     );
 }
 

@@ -11,28 +11,36 @@ export default function Account() {
     const [formData, setFormData] = useState({ name: '', email: '' });
     const [message, setMessage] = useState('');
 
+    // Initialize formData with user data if available
     useEffect(() => {
         if (authState.user) {
-            setFormData({ name: authState.user.name, email: authState.user.email });
+            setFormData({ name: authState.user.name || '', email: authState.user.email || '' });
         }
     }, [authState.user]);
 
-    // Fetch favorite tracks only if favorites are available and tracks haven't been fetched yet
+    // Fetch favorite tracks if the user has favorites
     useEffect(() => {
         if (authState.user && authState.user.favorites && authState.user.favorites.length > 0) {
-            // Only fetch if favoriteTracks are not already fetched
             if (trackState.favoriteTracks.length === 0) {
                 fetchFavoriteTracks(authState.user.favorites);
             }
         }
-    }, [authState.user]);
+    }, [authState.user, trackState.favoriteTracks]);
+
+    // Handle form submission
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // Example logic for form submission
+        setMessage("Profile updated successfully!");
+        // You can add actual logic for updating the profile if needed
+    };
 
     return (
         <div className="mt-24 p-4">
             <h1 className="text-white text-center">Account</h1>
-            <div className="text-center text-green-500">{message}</div>
+            {message && <div className="text-center text-green-500">{message}</div>}
 
-            <form className="text-white">
+            <form onSubmit={handleSubmit} className="text-white">
                 <label className="block">
                     Name:
                     <input
@@ -63,7 +71,7 @@ export default function Account() {
             <div className="mt-8">
                 <h2 className="text-white text-center">Your Favorite Tracks</h2>
 
-                {trackState.favoriteTracks.length > 0 ? (
+                {trackState.favoriteTracks?.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
                         {trackState.favoriteTracks.map((track) => (
                             <TrackCard key={track.id} track={track} />

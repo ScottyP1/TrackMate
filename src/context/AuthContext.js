@@ -1,9 +1,9 @@
-'use client'
-
+'use client';
 import createDataContext from "@/context/createDataContext";
 import axiosInstance from "@/api/axios";
+import Cookies from 'js-cookie';
 
-// Define the reducer to handle state updates
+// Reducer function to manage state
 const authReducer = (state, action) => {
     switch (action.type) {
         case 'add_error':
@@ -23,7 +23,8 @@ const authReducer = (state, action) => {
             return {
                 ...state,
                 token: action.payload.token,
-                errorMessage: ''
+                userAvatar: action.payload.avatar,
+                errorMessage: '',
             };
 
         case 'add_email':
@@ -34,16 +35,16 @@ const authReducer = (state, action) => {
                 ...state,
                 token: null,
                 errorMessage: '',
-                userEmail: ''
+                userEmail: '',
+                user: null,
+                userAvatar: '',
+                favorites: [],
             };
 
         case 'update_favorites':
             return {
                 ...state,
-                user: {
-                    ...state.user,
-                    favorites: action.payload // Update the favorites list directly
-                }
+                user: { ...state.user, favorites: action.payload },
             };
 
         default:
@@ -51,28 +52,36 @@ const authReducer = (state, action) => {
     }
 };
 
-// Clear any error before making a request
-const clearError = (dispatch) => () => {
-    dispatch({ type: 'clear_error' });
-};
-
-// Automatically load the token and email on app initialization
-const loadToken = (dispatch) => () => {
-    const token = localStorage.getItem('authToken');
-    const userEmail = localStorage.getItem('userEmail');
+// Load token and user data from cookies/localStorage
+const loadTokenAndUser = (dispatch) => () => {
+    const token = Cookies.get('authToken');
+    const userEmail = Cookies.get('userEmail');
+    const avatar = localStorage.getItem('profileAvatar') || null;
 
     if (token && userEmail) {
-        dispatch({ type: 'sign_in', payload: { token } });
-        dispatch({ type: 'add_email', payload: userEmail }); // Load email as well
+        dispatch({ type: 'sign_in', payload: { token, avatar } });
+        dispatch({ type: 'add_email', payload: userEmail });
+
+        // Fetch user data based on token/email
+        axiosInstance.get(`/Account?email=${userEmail}`)
+            .then(response => {
+                const user = response.data.user;
+                dispatch({ type: 'fetch_user', payload: { ...user, avatar } });
+            })
+            .catch(error => {
+                console.error("Failed to fetch user:", error);
+                dispatch({ type: 'add_error', payload: 'Failed to fetch user data.' });
+            });
     }
 };
 
+// Update favorites in the user's profile
 const updateFavorites = (dispatch) => async (email, favorites) => {
     dispatch({ type: 'set_loading', payload: true });
     try {
         const response = await axiosInstance.patch("/Account", { email, updates: { favorites } });
         const updatedUser = response.data.user;
-        dispatch({ type: 'update_favorites', payload: updatedUser.favorites }); // Update the favorites in the state
+        dispatch({ type: 'update_favorites', payload: updatedUser.favorites });
     } catch (error) {
         console.error("Error updating favorites:", error);
         dispatch({ type: 'add_error', payload: "Failed to update favorites." });
@@ -81,82 +90,64 @@ const updateFavorites = (dispatch) => async (email, favorites) => {
     }
 };
 
-const fetchUser = (dispatch) => async (email) => {
-    dispatch({ type: 'set_loading', payload: true });
-    try {
-        const response = await axiosInstance.get(`/Account?email=${email}`);
-        const user = response.data.user;
-        dispatch({ type: 'fetch_user', payload: { ...user, favorites: user.favorites || [] } });
-
-        // Optionally save the avatar in localStorage if not already there
-        if (user.avatar && !localStorage.getItem('profileAvatar')) {
-            localStorage.setItem('profileAvatar', user.avatar);
-        }
-    } catch (error) {
-        console.error("Failed to fetch user:", error);
-        dispatch({ type: 'add_error', payload: 'Failed to fetch user data.' });
-    } finally {
-        dispatch({ type: 'set_loading', payload: false });
-    }
-};
-
+// Update user information (like profile, email, etc.)
 const updateUser = (dispatch) => async ({ email, updates }) => {
     dispatch({ type: "set_loading", payload: true });
     try {
         const response = await axiosInstance.patch("/Account", { email, updates });
         const updatedUser = response.data.user;
-        dispatch({ type: "fetch_user", payload: updatedUser }); // Update user in state
+        dispatch({ type: "fetch_user", payload: updatedUser });
     } catch (error) {
         console.error("Error updating user:", error);
-
         const errorMessage =
-            error.response?.data || "Failed to update user data. Please try again.";
+            error.response?.data?.message || "Failed to update user data. Please try again.";
         dispatch({ type: "add_error", payload: errorMessage });
     } finally {
         dispatch({ type: "set_loading", payload: false });
     }
 };
 
+// Register a new user
 const register = (dispatch) => async ({ name, email, password, profileAvatar }) => {
     dispatch({ type: 'clear_error' });
     dispatch({ type: 'set_loading', payload: true });
     try {
-        const body = { name, email, password, profileAvatar }; // Send avatar field to backend
+        const body = { name, email, password, profileAvatar };
         const response = await axiosInstance.post('/auth/Register', body);
-        const { token, profileAvatar: avatar } = response.data; // Assuming the avatar is returned from the backend
+        const { token, profileAvatar: avatar } = response.data;
 
-        // Save token, email, and avatar in localStorage
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('userEmail', email);
-        localStorage.setItem('profileAvatar', avatar); // Save avatar in localStorage
+        // Store user data in cookies
+        Cookies.set('authToken', token, { expires: 7, path: '/' });
+        Cookies.set('userEmail', email, { expires: 7, path: '/' });
+        Cookies.set('profileAvatar', avatar, { expires: 7, path: '/' });
 
-        // Dispatch the necessary actions
-        dispatch({ type: 'register', payload: { token } });
+        dispatch({ type: 'register', payload: { token, avatar } });
         dispatch({ type: 'add_email', payload: email });
     } catch (e) {
-        dispatch({ type: 'add_error', payload: 'Something went wrong' });
+        dispatch({ type: 'add_error', payload: 'Something went wrong during registration' });
     } finally {
         dispatch({ type: 'set_loading', payload: false });
     }
 };
 
+// Sign in the user
 const signIn = (dispatch) => async ({ email, password }) => {
     dispatch({ type: 'set_loading', payload: true });
     try {
         const response = await axiosInstance.post('/auth/Login', { email, password });
-        const { token, profileAvatar } = response.data; // Ensure profileAvatar is returned as well
+        const { token, profileAvatar } = response.data;
 
         if (!response.data.email) {
             throw new Error('Email not returned from the server');
         }
 
-        // Ensure the email is returned from the backend
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('userEmail', email);  // Store email from the request
-        localStorage.setItem('profileAvatar', profileAvatar); // Store avatar in localStorage
+        // Store user data in cookies
+        Cookies.set('authToken', token, { expires: 7, path: '/' });
+        Cookies.set('userEmail', email, { expires: 7, path: '/' });
+        Cookies.set('profileAvatar', profileAvatar, { expires: 7, path: '/' });
 
-        dispatch({ type: 'sign_in', payload: { token } });
-        dispatch({ type: 'add_email', payload: email }); // Add email to state
+        dispatch({ type: 'sign_in', payload: { token, avatar: profileAvatar } });
+        dispatch({ type: 'add_email', payload: email });
         return Promise.resolve(); // Return a resolved Promise on success
     } catch (e) {
         dispatch({ type: 'add_error', payload: 'Invalid credentials' });
@@ -165,16 +156,22 @@ const signIn = (dispatch) => async ({ email, password }) => {
     }
 };
 
+// Sign out the user
 const signOut = (dispatch) => () => {
-    localStorage.removeItem('authToken'); // Remove token from localStorage
-    localStorage.removeItem('userEmail'); // Remove email from localStorage
-    localStorage.removeItem('profileAvatar'); // Remove avatar from localStorage
-    localStorage.removeItem('zip',);
-    dispatch({ type: 'sign_out' }); // Update state to reflect user is logged out
+    Cookies.remove('authToken');
+    Cookies.remove('userEmail');
+    Cookies.remove('profileAvatar');
+    dispatch({ type: 'sign_out' });
 };
 
+// Clear any error message before making a request
+const clearError = (dispatch) => () => {
+    dispatch({ type: 'clear_error' });
+};
+
+// Export the context provider and actions
 export const { Provider, Context } = createDataContext(
     authReducer,
-    { register, signIn, signOut, clearError, loadToken, fetchUser, updateUser, updateFavorites }, // Export all actions
-    { token: null, userEmail: '', user: null, favorites: [], errorMessage: '', loading: false }
+    { register, signIn, signOut, clearError, loadTokenAndUser, updateUser, updateFavorites },
+    { token: null, userEmail: '', user: null, userAvatar: '', favorites: [], errorMessage: '', loading: false }
 );

@@ -43,7 +43,7 @@ export default function ImageCarousel({ validImages }) {
                             <img
                                 src={image}
                                 alt={`Image ${index + 1}`}
-                                className="w-full object-cover cursor-pointer rounded-md h-[300px] md:h-[400px] lg:h-[600px]"
+                                className="w-full object-contain cursor-pointer rounded-md h-[300px] md:h-[400px] 2xl:h-[600px]"
                                 onClick={() => openFullscreen(index)}
                             />
                         </div>
