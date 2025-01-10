@@ -56,7 +56,7 @@ const authReducer = (state, action) => {
 const loadTokenAndUser = (dispatch) => () => {
     const token = Cookies.get('authToken');
     const userEmail = Cookies.get('userEmail');
-    const avatar = localStorage.getItem('profileAvatar') || null;
+    const avatar = Cookies.get('profileAvatar') || null;
 
     if (token && userEmail) {
         dispatch({ type: 'sign_in', payload: { token, avatar } });
@@ -117,8 +117,8 @@ const register = (dispatch) => async ({ name, email, password, profileAvatar }) 
         const { token, profileAvatar: avatar } = response.data;
 
         // Store user data in cookies
-        Cookies.set('authToken', token, { expires: 7, path: '/' });
-        Cookies.set('userEmail', email, { expires: 7, path: '/' });
+        Cookies.set('authToken', token, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
+        Cookies.set('userEmail', email, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
         Cookies.set('profileAvatar', avatar, { expires: 7, path: '/' });
 
         dispatch({ type: 'register', payload: { token, avatar } });
@@ -142,8 +142,8 @@ const signIn = (dispatch) => async ({ email, password }) => {
         }
 
         // Store user data in cookies
-        Cookies.set('authToken', token, { expires: 7, path: '/' });
-        Cookies.set('userEmail', email, { expires: 7, path: '/' });
+        Cookies.set('authToken', token, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
+        Cookies.set('userEmail', email, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
         Cookies.set('profileAvatar', profileAvatar, { expires: 7, path: '/' });
 
         dispatch({ type: 'sign_in', payload: { token, avatar: profileAvatar } });

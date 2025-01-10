@@ -1,11 +1,11 @@
-'use client'
+'use client';
 import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { Context as AuthContext } from '@/context/AuthContext';  // Ensure this is imported correctly for client-side use
 import Cookies from 'js-cookie';
 
 export const useFavorite = (trackId) => {
-    const { state, updateUser } = useContext(AuthContext);
+    const { state, updateFavorites } = useContext(AuthContext);
     const [isFavorite, setIsFavorite] = useState(false);
     const router = useRouter();
 
@@ -29,7 +29,8 @@ export const useFavorite = (trackId) => {
                 ? state.user.favorites.filter(fav => fav !== trackId)
                 : [...state.user.favorites, trackId];
 
-            await updateUser({ email: userEmail, updates: { favorites: newFavorites } });
+            // Use the updateFavorites action to update the favorites
+            await updateFavorites(userEmail, newFavorites);  // Update favorites in the context
             setIsFavorite(!isFavorite);  // Toggle the favorite status
         } catch (error) {
             console.error('Failed to update favorites', error);

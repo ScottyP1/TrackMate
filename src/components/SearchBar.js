@@ -1,30 +1,30 @@
 'use client'
-import { useContext, useState, useEffect } from 'react';
-import { Context as TrackContext } from '@/context/TrackContext';
+import { useState, useEffect } from 'react';
 import { FaSearchLocation } from 'react-icons/fa';
+import Cookies from 'js-cookie';
 
 export default function SearchBar({ onSearch }) {
-    const { state, setZipCode, setRadius } = useContext(TrackContext);  // Destructure the action functions
     const [searchTerm, setSearchTerm] = useState('');
-    const [radius, setRadiusState] = useState('10'); // State for radius
+    const [radius, setRadiusState] = useState('10');
 
-    // Effect to set searchTerm from context whenever state.zipcode changes
     useEffect(() => {
-        const zip = localStorage.getItem('zip')
-        setSearchTerm(zip || ''); // Update the searchTerm if state.zipcode changes
-    }, []); // Re-run if the context zipcode changes
+        const currentSearchTerm = Cookies.get('searchTerm');
+        setSearchTerm(currentSearchTerm || '');
+    }, []);
 
     // Submit handler
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (searchTerm && radius) { // Ensure both are selected
-            onSearch(searchTerm, Number(radius));  // Pass searchTerm (could be zip code or track name)
-
-            // Update the context state
-            setZipCode(searchTerm);
-            setRadius(radius);
+        const isZipCode = /^\d{5}$/.test(searchTerm);
+        if (searchTerm && radius) {
+            if (isZipCode) {
+                // If it's a ZIP code, pass it along with the radius
+                onSearch(searchTerm, Number(radius));
+            } else {
+                // If it's not a ZIP code, treat it as a track name
+                onSearch(searchTerm, Number(radius));
+            }
         } else {
-            // Optional: Handle error (e.g., show a message)
             alert("Please enter a search term and select a radius.");
         }
     };

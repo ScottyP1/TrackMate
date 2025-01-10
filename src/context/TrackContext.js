@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import createDataContext from '@/context/createDataContext';
 import axiosInstance from '@/api/axios';
+import Cookies from 'js-cookie';
 
 // Reducer function to manage track state
 const trackReducer = (state, action) => {
@@ -23,7 +24,7 @@ const trackReducer = (state, action) => {
         case 'clear_tracks':
             return { ...state, tracks: [], favoriteTracks: [] };  // Clear both tracks and favorite tracks
         case 'handle_invalid_zip_code':
-            return { ...state, tracks: [], errorMessage: 'Invalid zip code. Please try again.', loading: false };
+            return { ...state, tracks: [], zipCode: '', errorMessage: 'Invalid zip code. Please try again.', loading: false };
         case 'set_loading':
             return { ...state, loading: action.payload };
         default:
@@ -96,6 +97,8 @@ const fetchTracks = (dispatch) => async (searchTerm = '', radius = 10) => {
             dispatch({ type: 'fetch_tracks', payload: [] });
             dispatch({ type: 'add_error', payload: 'No tracks found with the given name or zip code.' });
         } else {
+            dispatch({ type: 'clear_error' })
+            Cookies.set('searchTerm', searchTerm, { expires: 7, path: '/' });
             dispatch({ type: 'fetch_tracks', payload: response.data });
         }
     } catch (e) {

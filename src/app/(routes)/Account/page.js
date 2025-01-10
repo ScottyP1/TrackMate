@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect, useContext } from "react";
-import { useRouter } from "next/navigation";
 import { Context as AuthContext } from "@/context/AuthContext";
 import { Context as TrackContext } from "@/context/TrackContext";
 import { TrackCard } from "@/components/Track/TrackCard";
@@ -11,21 +10,17 @@ export default function Account() {
     const [formData, setFormData] = useState({ name: '', email: '' });
     const [message, setMessage] = useState('');
 
-    // Initialize formData with user data if available
+    // Fetch favorite tracks if the user has favorites
     useEffect(() => {
         if (authState.user) {
             setFormData({ name: authState.user.name || '', email: authState.user.email || '' });
         }
-    }, [authState.user]);
-
-    // Fetch favorite tracks if the user has favorites
-    useEffect(() => {
         if (authState.user && authState.user.favorites && authState.user.favorites.length > 0) {
-            if (trackState.favoriteTracks.length === 0) {
-                fetchFavoriteTracks(authState.user.favorites);
+            if (trackState.favoriteTracks.length === 0 && !trackState.loading) {
+                fetchFavoriteTracks(authState.user.favorites); // Fetch the favorite tracks
             }
         }
-    }, [authState.user, trackState.favoriteTracks]);
+    }, [authState.user]);
 
     // Handle form submission
     const handleSubmit = (e) => {

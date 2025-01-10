@@ -1,35 +1,49 @@
 'use client'
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
+
+import DOMPurify from 'dompurify';
+
 import { Context as TrackContext } from '@/context/TrackContext';
 import SearchBar from '@/components/SearchBar';
 import { TrackCard } from '@/components/Track/TrackCard';
-import DOMPurify from 'dompurify';
+import { TrackCardSkeleton } from '@/components/Track/TrackCardSkeleton';
 
 export default function Tracks() {
-    const { state, fetchTracks, handleInvalidZipCode, loading, errorMessage } = useContext(TrackContext);
+    const { state, fetchTracks, setZipCode, setRadius, handleInvalidZipCode } = useContext(TrackContext);
 
-    // Get zipCode and radius from the context state
-    const { zipCode, radius } = state;
-
-    const handleSearch = async (zip, radius) => {
+    const handleSearch = async (searchTerm, radius) => {
         // Sanitize inputs
-        const sanitizedZip = DOMPurify.sanitize(zip);
+        const sanitizedSearchTerm = DOMPurify.sanitize(searchTerm);
         const sanitizedRadius = DOMPurify.sanitize(radius);
 
-        // If zip code is invalid, clear the tracks and set the error via context
-        if (!/^\d{5}$/.test(sanitizedZip)) {
-            handleInvalidZipCode();  // Handle invalid zip code via context
-        }
+        // Determine if searchTerm is a ZIP code or a track name
+        const isZipCode = /^\d{5}$/.test(sanitizedSearchTerm);
 
-        // Fetch tracks with the sanitized values
-        fetchTracks(sanitizedZip, sanitizedRadius);
+        if (isZipCode) {
+            setZipCode(sanitizedSearchTerm);  // If it's a ZIP code, save the ZIP code
+            setRadius(sanitizedRadius); // Set the radius
+            fetchTracks(sanitizedSearchTerm, sanitizedRadius); // Fetch tracks for the ZIP code
+        } else {
+            // If it's a track name, just use that with the radius
+            fetchTracks(sanitizedSearchTerm, sanitizedRadius);
+        }
     };
 
-    useEffect(() => {
-        if (zipCode && radius) {
-            handleSearch(zipCode, radius);
+    const renderTrackCardOrSkeleton = () => {
+        if (state.loading) {
+            // If loading, show a skeleton for each track
+            return Array(4).fill(null).map((_, index) => <TrackCardSkeleton key={index} />);
         }
-    }, [zipCode, radius]); // Trigger search whenever zipCode or radius changes
+
+        if (state.tracks.length === 0) {
+            return <p className="text-center text-lg col-span-full">Enter your ZIP code or track name to get started.</p>;
+        }
+
+        // Render the TrackCard component for each track
+        return state.tracks.map((track) => (
+            <TrackCard key={track._id || track.track_id} track={track} />
+        ));
+    };
 
     return (
         <div className="track-list p-4 mt-24">
@@ -37,22 +51,12 @@ export default function Tracks() {
                 <SearchBar onSearch={handleSearch} />
             </div>
 
-            {loading && <p>Loading...</p>}
-
-            {errorMessage && (
-                <p className="text-center text-lg text-red-500 mt-4">{errorMessage}</p>
+            {state.errorMessage && (
+                <p className="text-center text-lg text-red-500 mt-4">{state.errorMessage}</p>
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 mt-12">
-                {state.tracks.length > 0 ? (
-                    state.tracks.map((track) => (
-                        <TrackCard key={track._id || track.track_id} track={track} />
-                    ))
-                ) : (
-                    !loading && (
-                        <p className="text-center text-lg col-span-full">No tracks found with the given name or zip code. Please try again.</p>
-                    )
-                )}
+                {renderTrackCardOrSkeleton()}
             </div>
         </div>
     );

@@ -15,19 +15,19 @@ import Avatar from '@mui/material/Avatar';
 import logo from '@/public/images/logo.png';
 import { Context as AuthContext } from '@/context/AuthContext';
 import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';  // Import useRouter hook
 
 const pages = ['Home', 'Tracks', 'About', 'HowTo'];
 
 function NavBar() {
     const [menuAnchor, setMenuAnchor] = React.useState(null);
     const [userMenuAnchor, setUserMenuAnchor] = React.useState(null);
-    const [userAvatar, setUserAvatar] = React.useState('');  // Default avatar
+    const [userAvatar, setUserAvatar] = React.useState('/Avatars/default-avatar.png');  // Default avatar
     const { state, loadTokenAndUser, signOut } = React.useContext(AuthContext);
     const pathname = usePathname();
+    const router = useRouter();
 
-    // Load user avatar from cookies and context on initial render
     React.useEffect(() => {
-        // Check if avatar exists in cookies (use it only if the context doesn't have it yet)
         const avatarFromCookies = Cookies.get('profileAvatar');
 
         if (avatarFromCookies && state.user?.avatar !== avatarFromCookies) {
@@ -35,17 +35,28 @@ function NavBar() {
         } else {
             setUserAvatar(state.user?.avatar || '/Avatars/default-avatar.png');
         }
-
-        // Load user and token from cookies if not already loaded (to avoid redundant calls)
         if (!state.token) {
             loadTokenAndUser();
         }
-    }, [state.user, loadTokenAndUser]);
+    }, [state.user]);
 
     const handleMenuOpen = (event) => setMenuAnchor(event.currentTarget);
     const handleMenuClose = () => setMenuAnchor(null);
     const handleUserMenuOpen = (event) => setUserMenuAnchor(event.currentTarget);
     const handleUserMenuClose = () => setUserMenuAnchor(null);
+
+    // Handle sign-out and redirection
+    const handleSignOut = () => {
+        signOut();  // Sign out logic
+        handleUserMenuClose();  // Close user menu
+    };
+
+    // Redirect to '/' after sign-out (using useEffect)
+    React.useEffect(() => {
+        if (!state.token) {
+            router.push('/');  // Redirect to home after sign-out
+        }
+    }, [state.token, router]);
 
     const getPagePath = (page) => (page === 'Home' ? '/' : `/${page}`);
     const isActivePage = (page) => pathname === getPagePath(page);
@@ -148,13 +159,13 @@ function NavBar() {
                                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                                 transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                             >
-                                <MenuItem>
+                                <MenuItem onClick={() => handleUserMenuClose()}>
                                     <Link href="/Account">Account</Link>
                                 </MenuItem>
-                                <MenuItem>
+                                <MenuItem onClick={() => handleUserMenuClose()}>
                                     <Link href="/Inbox">Inbox</Link>
                                 </MenuItem>
-                                <MenuItem onClick={() => { signOut(); handleUserMenuClose(); }}>Log out</MenuItem>
+                                <MenuItem onClick={handleSignOut}>Log out</MenuItem>
                             </Menu>
                         </>
                     )}

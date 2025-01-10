@@ -1,11 +1,11 @@
 // components/TrackCard.js
 import { useFavorite } from '@/hooks/useFavorite';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+
+import { MdFavorite, MdOutlineFavoriteBorder } from "react-icons/md";
 
 export const TrackCard = ({ track }) => {
     const { isFavorite, handleFavoriteClick } = useFavorite(track.placeId);
-    const router = useRouter();
 
     return (
         <div className="bg-gray-800 rounded-md overflow-hidden shadow-lg lg:hover:shadow-2xl lg:hover:shadow-blue-500">
@@ -29,7 +29,10 @@ export const TrackCard = ({ track }) => {
                         className={`cursor-pointer ${isFavorite ? 'text-red-500' : 'text-gray-400'}`}
                         onClick={handleFavoriteClick}
                     >
-                        {isFavorite ? '❤️' : '🤍'}
+                        {isFavorite ?
+                            <MdFavorite size={30} />
+                            : <MdOutlineFavoriteBorder size={30} />
+                        }
                     </span>
                 </div>
             </div>
