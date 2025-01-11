@@ -34,19 +34,21 @@ userSchema.pre('save', function (next) {
 
 // Method to compare the password
 userSchema.methods.comparePassword = function (userPassword) {
-    const user = this;
     return new Promise((resolve, reject) => {
-        bcrypt.compare(userPassword, user.password, (err, isMatch) => {
+        bcrypt.compare(userPassword, this.password, (err, isMatch) => {
             if (err) {
-                return reject(err);
+                console.error("Error during password comparison:", err); // Log the error
+                return reject(new Error("Error comparing passwords"));
             }
             if (!isMatch) {
-                return reject(false);
+                return reject(new Error("Invalid email or password"));
             }
             resolve(true);
         });
     });
 };
+
+
 
 // Check if the model is already defined, and only define it if it's not
 const User = mongoose.models.User || mongoose.model('User', userSchema);

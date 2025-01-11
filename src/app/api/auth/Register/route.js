@@ -29,14 +29,11 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Password must be at least 6 characters long' }, { status: 422 });
         }
 
-        // Hash the password before saving it to the database
-        const hashedPassword = await bcrypt.hash(password, 10);
-
         // Create a new user
         const user = new User({
             name,
             email: sanitizedEmail,
-            password: hashedPassword, // Save the hashed password
+            password: password, // Save the hashed password
             profileAvatar,
         });
 
