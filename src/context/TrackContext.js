@@ -124,7 +124,7 @@ const handleInvalidZipCode = (dispatch) => () => {
     dispatch({ type: 'handle_invalid_zip_code' });
 };
 const setZipCode = (dispatch) => (zipCode) => {
-    localStorage.setItem('zip', zipCode);
+    Cookies.set('searchTerm', zipCode);
     dispatch({ type: 'set_zip_code', payload: zipCode });
 };
 

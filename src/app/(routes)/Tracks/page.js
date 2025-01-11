@@ -9,7 +9,7 @@ import { TrackCard } from '@/components/Track/TrackCard';
 import { TrackCardSkeleton } from '@/components/Track/TrackCardSkeleton';
 
 export default function Tracks() {
-    const { state, fetchTracks, setZipCode, setRadius, handleInvalidZipCode } = useContext(TrackContext);
+    const { state, fetchTracks, setZipCode, setRadius } = useContext(TrackContext);
 
     const handleSearch = async (searchTerm, radius) => {
         // Sanitize inputs

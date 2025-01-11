@@ -2,6 +2,7 @@
 import { useState } from "react";
 import axiosInstance from "@/api/axios";
 import { FaUserCircle } from "react-icons/fa"; // User icon library
+import Cookies from "js-cookie";
 
 export default function CommentForm({ trackId, onCommentSubmit }) {
     const [commentText, setCommentText] = useState('');
@@ -11,11 +12,11 @@ export default function CommentForm({ trackId, onCommentSubmit }) {
     const handleCommentSubmit = async (event) => {
         event.preventDefault();
 
-        const token = localStorage.getItem('authToken');
-        const userEmail = localStorage.getItem('userEmail');
+        const token = Cookies.get('authToken');
+        const userEmail = Cookies.get('userEmail');
 
         if (!token || !userEmail) {
-            setErrorMessage('You must be logged in to comment.');
+            setErrorMessage('You must be logged in to commentt.');
             return;
         }
 

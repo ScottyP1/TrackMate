@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { FaUser } from "react-icons/fa";
+import Cookies from "js-cookie";
 
 export default function ReplyForm({ commentId, replies, userName }) {
     const [isReplying, setIsReplying] = useState(false);
@@ -10,7 +11,7 @@ export default function ReplyForm({ commentId, replies, userName }) {
 
     const handleReplySubmit = async () => {
         if (!replyText.trim()) return;
-        const userEmail = localStorage.getItem("userEmail");
+        const userEmail = Cookies.get("userEmail");
 
         if (!userEmail) {
             alert("Please log in to reply.");

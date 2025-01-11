@@ -6,6 +6,7 @@ import { Context as AuthContext } from '@/context/AuthContext';
 import { HiEye, HiEyeOff } from 'react-icons/hi'; // Add the eye icon library for visibility toggle
 
 import AvatarList from '@/components/AvatarList';
+import validator from 'validator'; // Import validator for email validation and sanitization
 
 export default function Register() {
     const { state, register, clearError } = useContext(AuthContext);
@@ -16,6 +17,7 @@ export default function Register() {
         profileAvatar: '',
     });
     const [passwordVisible, setPasswordVisible] = useState(false); // State to toggle password visibility
+    const [errors, setErrors] = useState({});
     const router = useRouter();
 
     useEffect(() => {
@@ -28,31 +30,73 @@ export default function Register() {
         }
     }, [state.token, router]);
 
+    // Handle changes to input fields
     const handleChange = (evt) => {
         const { name, value } = evt.target;
         setData((prevData) => ({ ...prevData, [name]: value }));
     };
 
+    // Handle avatar selection
     const onSelect = (avatar) => {
-        setData((prevData) => ({ ...prevData, profileAvatar: avatar.src })); // Save the image path directly
+        const cleanedPath = avatar.src
+            .replace('/_next/static/media', '/Avatars')  // Replace the path part
+            .split('.')
+        setData((prevData) => ({ ...prevData, profileAvatar: `${cleanedPath[0]}.${cleanedPath[2]}` }));
+    };
+    // Toggle password visibility
+    const togglePasswordVisibility = () => {
+        setPasswordVisible((prev) => !prev); // Toggle password visibility
     };
 
+    // Frontend validation and sanitization
+    const validateForm = () => {
+        const newErrors = {};
+
+        // Validate name (trim and check for non-empty)
+        if (!data.name.trim()) {
+            newErrors.name = 'Name is required.';
+        }
+
+        // Validate email (trim and check if valid)
+        const sanitizedEmail = validator.trim(data.email.toLowerCase());
+        if (!sanitizedEmail || !validator.isEmail(sanitizedEmail)) {
+            newErrors.email = 'Please enter a valid email.';
+        }
+
+        // Validate password (check length and basic strength)
+        if (data.password.length < 6) {
+            newErrors.password = 'Password must be at least 6 characters.';
+        }
+
+        // Validate avatar selection
+        if (!data.profileAvatar) {
+            newErrors.profileAvatar = 'Please select an avatar.';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    // Handle form submission
     const handleSubmit = async (evt) => {
         evt.preventDefault();
+
+        // Validate form before submitting
+        if (!validateForm()) {
+            return;
+        }
+
         try {
+            // Perform the registration action
             await register({
-                name: data.name,
-                email: data.email,
+                name: data.name.trim(),
+                email: data.email.trim().toLowerCase(), // Ensure email is sanitized
                 password: data.password,
                 profileAvatar: data.profileAvatar, // Send selected avatar
             });
         } catch (err) {
             console.error('Registration error:', err);
         }
-    };
-
-    const togglePasswordVisibility = () => {
-        setPasswordVisible((prev) => !prev); // Toggle password visibility
     };
 
     return (
@@ -74,6 +118,7 @@ export default function Register() {
                             value={data.name}
                             onChange={handleChange}
                         />
+                        {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                     </div>
 
                     {/* Email Field */}
@@ -90,6 +135,7 @@ export default function Register() {
                             value={data.email}
                             onChange={handleChange}
                         />
+                        {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
                     </div>
 
                     {/* Password Field */}
@@ -113,12 +159,14 @@ export default function Register() {
                         >
                             {passwordVisible ? <HiEyeOff size={24} /> : <HiEye size={24} />}
                         </button>
+                        {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
                     </div>
 
                     {/* Avatar Selection */}
                     <div>
                         <h1 className="text-white text-center mb-4">Select your Avatar</h1>
                         <AvatarList onSelect={onSelect} />
+                        {errors.profileAvatar && <p className="text-red-500 text-sm">{errors.profileAvatar}</p>}
                     </div>
 
                     {/* Error Message */}

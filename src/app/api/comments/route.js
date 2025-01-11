@@ -138,7 +138,7 @@ export async function POST(req) {
         });
 
         await comment.save();
-        const populatedComment = await comment.populate("userId", "name");
+        const populatedComment = await comment.populate("userId", "name profileAvatar");
 
         return NextResponse.json(populatedComment, { status: 201 });
     } catch (err) {
@@ -146,3 +146,32 @@ export async function POST(req) {
         return new Response("Internal Server Error", { status: 500 });
     }
 }
+
+export async function DELETE(req) {
+    const { searchParams } = new URL(req.url);
+    const commentId = searchParams.get("commentId");
+
+    if (!commentId) {
+        return new Response("Comment ID is required", { status: 400 });
+    }
+
+    try {
+        await dbConnect();
+
+        // Find and delete the comment by ID
+        const deletedComment = await Comment.findByIdAndDelete(commentId);
+
+        if (!deletedComment) {
+            return new Response("Comment not found", { status: 404 });
+        }
+
+        return new Response(JSON.stringify({ message: "Comment deleted successfully" }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+        });
+    } catch (error) {
+        console.error("Error deleting comment:", error);
+        return new Response("Failed to delete comment", { status: 500 });
+    }
+}
+

@@ -3,6 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import { Context as AuthContext } from "@/context/AuthContext";
 import { Context as TrackContext } from "@/context/TrackContext";
 import { TrackCard } from "@/components/Track/TrackCard";
+import Cookies from "js-cookie";
 
 export default function Account() {
     const { state: authState } = useContext(AuthContext);
@@ -20,7 +21,7 @@ export default function Account() {
                 fetchFavoriteTracks(authState.user.favorites); // Fetch the favorite tracks
             }
         }
-    }, [authState.user]);
+    }, [authState.user, authState.token]);
 
     // Handle form submission
     const handleSubmit = (e) => {

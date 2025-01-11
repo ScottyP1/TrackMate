@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import Image from 'next/image';
 
-import dino from '@/public/Avatars/dino.png';
-import dirtbike from '@/public/Avatars/dirtbike.png';
-import duck from '@/public/Avatars/duck.png';
-import monster from '@/public/Avatars/monster.png';
-import ninja from '@/public/Avatars/ninja.png';
-import panda from '@/public/Avatars/panda.png';
-import racer from '@/public/Avatars/racer.png';
-import shark from '@/public/Avatars/shark.png';
+import dino from 'public/Avatars/dino.png';
+import dirtbike from 'public/Avatars/dirtbike.png';
+import duck from 'public/Avatars/duck.png';
+import monster from 'public/Avatars/monster.png';
+import ninja from 'public/Avatars/ninja.png';
+import panda from 'public/Avatars/panda.png';
+import racer from 'public/Avatars/racer.png';
+import shark from 'public/Avatars/shark.png';
 
 export default function AvatarList({ onSelect }) {
     const [selectedAvatar, setSelectedAvatar] = useState(null); // Track selected avatar

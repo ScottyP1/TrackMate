@@ -1,16 +1,16 @@
-'use client';
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import CommentItem from "./CommentItem";
+import Cookies from "js-cookie";
 
 export default function CommentsSection({ trackId }) {
     const [comments, setComments] = useState([]);
     const [newCommentText, setNewCommentText] = useState("");
     const [userName, setUserName] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
+    // Fetch comments when trackId changes
     useEffect(() => {
-        setComments([]);
         const fetchComments = async () => {
             try {
                 const response = await axios.get(`/api/comments?trackId=${trackId}`);
@@ -22,19 +22,20 @@ export default function CommentsSection({ trackId }) {
 
         fetchComments();
 
-        const storedUserName = localStorage.getItem("userName");
-        if (storedUserName) {
-            setUserName(storedUserName);
+        const storedName = Cookies.get("name");
+        if (storedName) {
+            setUserName(storedName);
         }
     }, [trackId]);
 
+    // Handle comment submission
     const handleCommentSubmit = async () => {
         if (!newCommentText.trim()) return;
 
-        const userEmail = localStorage.getItem("userEmail");
+        const userEmail = Cookies.get("userEmail");
 
         if (!userEmail) {
-            alert("Please log in first.");
+            setErrorMessage("You must be logged in to comment.");
             return;
         }
 
@@ -48,16 +49,44 @@ export default function CommentsSection({ trackId }) {
 
             if (response.status === 201) {
                 setNewCommentText("");
+                // Add the new comment to the state (it should have populated user data)
                 setComments((prevComments) => [response.data, ...prevComments]);
+                setErrorMessage(""); // Clear error message
             }
         } catch (error) {
             console.error("Error submitting comment:", error);
+            setErrorMessage("An error occurred while submitting your comment.");
+        }
+    };
+
+    // Handle comment deletion
+    const handleCommentDelete = async (deletedCommentId) => {
+        try {
+            // First, filter out the deleted comment from the local state
+            setComments((prevComments) =>
+                prevComments.filter((comment) => comment._id !== deletedCommentId)
+            );
+
+            // Optionally, refetch the comments from the backend to sync the state
+            const response = await axios.get(`/api/comments?trackId=${trackId}`);
+            setComments(response.data.comments);  // Update the state with the latest comments
+
+        } catch (error) {
+            console.error("Error fetching comments after deletion:", error);
+            // Optionally handle the error if the refetch fails
         }
     };
 
     return (
         <div className="bg-gray-800 p-4 sm:p-6 rounded-md shadow-md space-y-6">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-200">Comments</h2>
+
+            {/* Error Message */}
+            {errorMessage && (
+                <div className="bg-red-500 text-white p-2 rounded-md text-sm">
+                    {errorMessage}
+                </div>
+            )}
 
             {/* Comment Form */}
             <div className="flex flex-col space-y-2">
@@ -83,6 +112,7 @@ export default function CommentsSection({ trackId }) {
                             key={comment._id}
                             comment={comment}
                             userName={userName}
+                            onCommentDelete={handleCommentDelete} // Pass delete handler here
                         />
                     ))
                 ) : (

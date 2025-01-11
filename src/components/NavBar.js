@@ -12,7 +12,6 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuIcon from '@mui/icons-material/Menu';
 import Image from 'next/image';
 import Avatar from '@mui/material/Avatar';
-import logo from '@/public/images/logo.png';
 import { Context as AuthContext } from '@/context/AuthContext';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';  // Import useRouter hook
@@ -28,39 +27,33 @@ function NavBar() {
     const router = useRouter();
 
     React.useEffect(() => {
-        const avatarFromCookies = Cookies.get('profileAvatar');
+        const avatarFromCookies = Cookies.get('profileAvatar'); // Read avatar from cookies
 
+        // Set avatar based on cookies or default
         if (avatarFromCookies && state.user?.avatar !== avatarFromCookies) {
-            setUserAvatar(avatarFromCookies);
+            setUserAvatar(avatarFromCookies);  // Use avatar from cookies if different
         } else {
-            setUserAvatar(state.user?.avatar || '/Avatars/default-avatar.png');
+            setUserAvatar(state.user?.profileAvatar || avatarFromCookies || '/Avatars/default-avatar.png');  // Fallback to default
         }
+
+        // If the user is not authenticated, try loading their token and user
         if (!state.token) {
             loadTokenAndUser();
         }
-    }, [state.user]);
+    })
 
     const handleMenuOpen = (event) => setMenuAnchor(event.currentTarget);
     const handleMenuClose = () => setMenuAnchor(null);
     const handleUserMenuOpen = (event) => setUserMenuAnchor(event.currentTarget);
     const handleUserMenuClose = () => setUserMenuAnchor(null);
+    const getPagePath = (page) => (page === 'Home' ? '/' : `/${page}`);
+    const isActivePage = (page) => pathname === getPagePath(page);
 
     // Handle sign-out and redirection
     const handleSignOut = () => {
         signOut();  // Sign out logic
         handleUserMenuClose();  // Close user menu
     };
-
-    // Redirect to '/' after sign-out (using useEffect)
-    React.useEffect(() => {
-        if (!state.token) {
-            router.push('/');  // Redirect to home after sign-out
-        }
-    }, [state.token, router]);
-
-    const getPagePath = (page) => (page === 'Home' ? '/' : `/${page}`);
-    const isActivePage = (page) => pathname === getPagePath(page);
-
     return (
         <AppBar position="fixed" sx={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', zIndex: 10 }}>
             <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 65, px: 2 }}>
@@ -113,14 +106,14 @@ function NavBar() {
                 {/* Centered Logo */}
                 <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' }, justifyContent: 'center' }}>
                     <Link href="/" passHref>
-                        <Image src={logo} width={120} height={45} alt="Logo" />
+                        <Image src={'/images/logo.png'} width={120} height={45} alt="Logo" />
                     </Link>
                 </Box>
 
                 {/* Desktop Navigation */}
                 <Box sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'start', alignItems: 'center', gap: 3 }}>
                     <Link href="/" passHref>
-                        <Image src={logo} width={120} height={45} alt="Logo" />
+                        <Image src={'/images/logo.png'} width={120} height={45} alt="Logo" />
                     </Link>
                     {pages.map((page) => {
                         const isCurrentPage =

@@ -23,7 +23,7 @@ const authReducer = (state, action) => {
             return {
                 ...state,
                 token: action.payload.token,
-                userAvatar: action.payload.avatar,
+                profileAvatar: action.payload.profileAvatar,
                 errorMessage: '',
             };
 
@@ -37,7 +37,7 @@ const authReducer = (state, action) => {
                 errorMessage: '',
                 userEmail: '',
                 user: null,
-                userAvatar: '',
+                profileAvatar: '',
                 favorites: [],
             };
 
@@ -52,7 +52,6 @@ const authReducer = (state, action) => {
     }
 };
 
-// Load token and user data from cookies/localStorage
 const loadTokenAndUser = (dispatch) => () => {
     const token = Cookies.get('authToken');
     const userEmail = Cookies.get('userEmail');
@@ -114,14 +113,15 @@ const register = (dispatch) => async ({ name, email, password, profileAvatar }) 
     try {
         const body = { name, email, password, profileAvatar };
         const response = await axiosInstance.post('/auth/Register', body);
-        const { token, profileAvatar: avatar } = response.data;
-
+        const { token, userId } = response.data;
         // Store user data in cookies
         Cookies.set('authToken', token, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
         Cookies.set('userEmail', email, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
-        Cookies.set('profileAvatar', avatar, { expires: 7, path: '/' });
+        Cookies.set('userId', userId, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
+        Cookies.set('name', name, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
+        Cookies.set('profileAvatar', profileAvatar, { expires: 7, path: '/' });
 
-        dispatch({ type: 'register', payload: { token, avatar } });
+        dispatch({ type: 'register', payload: { token, profileAvatar } });
         dispatch({ type: 'add_email', payload: email });
     } catch (e) {
         dispatch({ type: 'add_error', payload: 'Something went wrong during registration' });
@@ -135,7 +135,7 @@ const signIn = (dispatch) => async ({ email, password }) => {
     dispatch({ type: 'set_loading', payload: true });
     try {
         const response = await axiosInstance.post('/auth/Login', { email, password });
-        const { token, profileAvatar } = response.data;
+        const { token, profileAvatar, name } = response.data;
 
         if (!response.data.email) {
             throw new Error('Email not returned from the server');
@@ -144,6 +144,8 @@ const signIn = (dispatch) => async ({ email, password }) => {
         // Store user data in cookies
         Cookies.set('authToken', token, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
         Cookies.set('userEmail', email, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
+        Cookies.set('userId', userId, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
+        Cookies.set('name', name, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
         Cookies.set('profileAvatar', profileAvatar, { expires: 7, path: '/' });
 
         dispatch({ type: 'sign_in', payload: { token, avatar: profileAvatar } });
@@ -160,7 +162,9 @@ const signIn = (dispatch) => async ({ email, password }) => {
 const signOut = (dispatch) => () => {
     Cookies.remove('authToken');
     Cookies.remove('userEmail');
+    Cookies.remove('name')
     Cookies.remove('profileAvatar');
+    Cookies.remove('searchTerm');
     dispatch({ type: 'sign_out' });
 };
 
@@ -173,5 +177,5 @@ const clearError = (dispatch) => () => {
 export const { Provider, Context } = createDataContext(
     authReducer,
     { register, signIn, signOut, clearError, loadTokenAndUser, updateUser, updateFavorites },
-    { token: null, userEmail: '', user: null, userAvatar: '', favorites: [], errorMessage: '', loading: false }
+    { token: null, userEmail: '', user: null, profileAvatar: '', favorites: [], errorMessage: '', loading: false }
 );
