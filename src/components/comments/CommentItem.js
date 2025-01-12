@@ -71,7 +71,7 @@ export default function CommentItem({ comment, userName, onCommentDelete }) {
 
     // Check if the current user owns the comment (userId should match the userId in cookies)
     const canDelete = comment.userId._id === userId;
-    console.log(comment)
+
     return (
         <div className="bg-gray-700 p-3 sm:p-4 rounded-md shadow space-y-3 relative">
             {/* Delete Button - only visible if the user is the comment owner */}

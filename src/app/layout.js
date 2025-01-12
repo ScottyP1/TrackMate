@@ -1,6 +1,8 @@
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
 import NavBar from "../components/NavBar";
+import Footer from "@/components/Footer";
+
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { Provider as AuthProvider } from '@/context/AuthContext';
 import { Provider as TrackProvider } from '@/context/TrackContext';
@@ -23,9 +25,12 @@ export default function RootLayout({ children }) {
           <TrackProvider>
             <AppRouterCacheProvider>
               <SpeedInsights />
-              <div className="text-white items-center justify-items-center min-h-screen">
+              <div className="text-white flex flex-col min-h-screen">
                 <NavBar />
-                {children}
+                {/* Main content area */}
+                <main className="flex-grow">{children}</main>
+                {/* Footer stays at bottom when content is smaller than viewport */}
+                <Footer />
               </div>
             </AppRouterCacheProvider>
           </TrackProvider>

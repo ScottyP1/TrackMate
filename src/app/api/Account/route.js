@@ -43,7 +43,7 @@ export async function PATCH(req) {
         }
 
         // Validate allowed fields (name, password, favorites)
-        const allowedUpdates = ["name", "password", "favorites"];
+        const allowedUpdates = ["name", "password", "favorites", 'profileAvatar'];
         const keysToUpdate = Object.keys(updates);
         const isValidUpdate = keysToUpdate.every((key) => allowedUpdates.includes(key));
 
@@ -72,10 +72,10 @@ export async function PATCH(req) {
         }
 
         // Handle password update if present
-        if (updates.password) {
-            const salt = await bcrypt.genSalt(10);
-            updates.password = await bcrypt.hash(updates.password, salt);
-        }
+        // if (updates.password) {
+        //     const salt = await bcrypt.genSalt(10);
+        //     updates.password = await bcrypt.hash(updates.password, salt);
+        // }
 
         // Update the user (ignoring favorites field since we handled it separately)
         const updatedUser = await User.findOneAndUpdate(

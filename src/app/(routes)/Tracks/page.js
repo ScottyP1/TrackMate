@@ -1,5 +1,5 @@
 'use client'
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 
 import DOMPurify from 'dompurify';
 

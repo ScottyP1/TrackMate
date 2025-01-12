@@ -14,7 +14,7 @@ const trackReducer = (state, action) => {
         case 'fetch_tracks':
             return { ...state, tracks: action.payload, loading: false };
         case 'fetch_favorite_tracks':
-            return { ...state, favoriteTracks: action.payload, loading: false };  // Store favorite tracks separately
+            return { ...state, favoriteTracks: action.payload, loading: false };
         case 'fetch_track':
             return { ...state, track: action.payload, loading: false };
         case 'add_error':
@@ -63,6 +63,7 @@ const fetchFavoriteTracks = (dispatch) => async (trackIds) => {
     try {
         const trackPromises = trackIds.map(trackId => fetchTrackById(dispatch)(trackId));
         const trackData = await Promise.all(trackPromises);
+
         // Dispatch the fetched favorite tracks to the favoriteTracks state
         dispatch({ type: 'fetch_favorite_tracks', payload: trackData });
     } catch (error) {
@@ -70,6 +71,7 @@ const fetchFavoriteTracks = (dispatch) => async (trackIds) => {
         dispatch({ type: 'add_error', payload: 'Failed to fetch favorite tracks' });
     }
 };
+
 
 
 const fetchTracks = (dispatch) => async (searchTerm = '', radius = 10) => {

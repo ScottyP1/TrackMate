@@ -32,7 +32,6 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Invalid email or password.' }, { status: 422 });
         }
 
-        console.log(user, password)
         // Use the comparePassword method from the schema
         const isMatch = await user.comparePassword(password);
 

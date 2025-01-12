@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Context as AuthContext } from '@/context/AuthContext';
 import { HiEye, HiEyeOff } from 'react-icons/hi'; // Add the eye icon library for visibility toggle
+import { FaSpinner } from 'react-icons/fa'; // Spinner for loader
 
 import AvatarList from '@/components/AvatarList';
 import validator from 'validator'; // Import validator for email validation and sanitization
@@ -117,6 +118,7 @@ export default function Register() {
                             className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={data.name}
                             onChange={handleChange}
+                            disabled={state.loading}
                         />
                         {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                     </div>
@@ -134,6 +136,7 @@ export default function Register() {
                             className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={data.email}
                             onChange={handleChange}
+                            disabled={state.loading}
                         />
                         {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
                     </div>
@@ -151,11 +154,13 @@ export default function Register() {
                             className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-12" // Added padding-right for icon
                             value={data.password}
                             onChange={handleChange}
+                            disabled={state.loading}
                         />
                         <button
                             type="button"
                             className="absolute right-3 top-[43px] transform -translate-y-1/2"
                             onClick={togglePasswordVisibility}
+                            disabled={state.loading}
                         >
                             {passwordVisible ? <HiEyeOff size={24} /> : <HiEye size={24} />}
                         </button>
@@ -176,9 +181,14 @@ export default function Register() {
                         )}
                         <button
                             type="submit"
-                            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-200"
+                            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-200 relative flex justify-center items-center"
+                            disabled={state.loading}
                         >
-                            Submit
+                            {state.loading ? (
+                                <FaSpinner className="animate-spin text-white absolute" size={24} />
+                            ) : (
+                                'Submit'
+                            )}
                         </button>
                     </div>
                 </form>

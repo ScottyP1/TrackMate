@@ -10,7 +10,7 @@ import panda from 'public/Avatars/panda.png';
 import racer from 'public/Avatars/racer.png';
 import shark from 'public/Avatars/shark.png';
 
-export default function AvatarList({ onSelect }) {
+export default function AvatarList({ onSelect, classes }) {
     const [selectedAvatar, setSelectedAvatar] = useState(null); // Track selected avatar
 
     const images = [dino, dirtbike, duck, monster, ninja, panda, racer, shark];
@@ -25,7 +25,7 @@ export default function AvatarList({ onSelect }) {
             {images.map((image) => (
                 <div
                     key={image.src}
-                    className={`p-2 rounded-full border-2 ${selectedAvatar === image ? 'border-blue-500 bg-blue-100' : 'border-gray-400'
+                    className={`${classes} p-2 rounded-full border-2 ${selectedAvatar === image ? 'border-blue-500 bg-blue-100' : 'border-gray-400'
                         }`}
                     onClick={() => handleSelect(image)}
                 >
