@@ -52,6 +52,7 @@ const fetchTrackById = (dispatch) => async (placeId) => {
     try {
         let response = await axiosInstance.get(`/Tracks/${placeId}`);
         dispatch({ type: 'fetch_track', payload: response.data });
+
         return response.data;  // Return the track data
     } catch (e) {
         dispatch({ type: 'add_error', payload: 'Failed to fetch track' });
@@ -64,13 +65,15 @@ const fetchFavoriteTracks = (dispatch) => async (trackIds) => {
         const trackPromises = trackIds.map(trackId => fetchTrackById(dispatch)(trackId));
         const trackData = await Promise.all(trackPromises);
 
-        // Dispatch the fetched favorite tracks to the favoriteTracks state
+        // Log track data to inspect the fields
+
         dispatch({ type: 'fetch_favorite_tracks', payload: trackData });
     } catch (error) {
         console.error('Error fetching favorite tracks:', error);
         dispatch({ type: 'add_error', payload: 'Failed to fetch favorite tracks' });
     }
 };
+
 
 
 

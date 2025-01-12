@@ -24,6 +24,7 @@ const authReducer = (state, action) => {
                 ...state,
                 token: action.payload.token,
                 errorMessage: '',
+                user: action.payload.user || state.user, // Add user info if available
             };
 
         case 'add_email':
@@ -36,14 +37,18 @@ const authReducer = (state, action) => {
                 errorMessage: '',
                 userEmail: '',
                 user: null,
-                profileAvatar: '',
-                favorites: [],
             };
 
         case 'update_favorites':
             return {
                 ...state,
                 user: { ...state.user, favorites: action.payload },
+            };
+
+        case 'update_user':
+            return {
+                ...state,
+                user: { ...state.user, ...action.payload },
             };
 
         default:
@@ -63,7 +68,7 @@ const loadTokenAndUser = (dispatch) => () => {
         axiosInstance.get(`/Account?email=${userEmail}`)
             .then(response => {
                 const user = response.data.user;
-                dispatch({ type: 'fetch_user', payload: { ...user } });
+                dispatch({ type: 'fetch_user', payload: user });
             })
             .catch(error => {
                 console.error("Failed to fetch user:", error);
@@ -91,19 +96,19 @@ const updateFavorites = (dispatch) => async (email, favorites) => {
 const updateUser = (dispatch) => async ({ email, updates }) => {
     dispatch({ type: "set_loading", payload: true });
     try {
-        // Ensure email and updates are passed correctly
         const response = await axiosInstance.patch("/Account", { email, updates });
         const updatedUser = response.data.user;
 
-        // If the profile avatar is updated, update the cookie
+        // Update cookies if the profile avatar or name changes
         if (updates.profileAvatar) {
             Cookies.set('profileAvatar', updates.profileAvatar, { expires: 7, path: '/', sameSite: 'Strict' });
         }
         if (updates.name) {
             Cookies.set('name', updates.name, { expires: 7, path: '/', sameSite: 'Strict' });
         }
+
         // Dispatch actions to update user in the app state
-        dispatch({ type: "fetch_user", payload: updatedUser });
+        dispatch({ type: "update_user", payload: updatedUser });
     } catch (error) {
         console.error("Error updating user:", error);
         const errorMessage =
@@ -114,8 +119,6 @@ const updateUser = (dispatch) => async ({ email, updates }) => {
     }
 };
 
-
-
 // Register a new user
 const register = (dispatch) => async ({ name, email, password, profileAvatar }) => {
     dispatch({ type: 'clear_error' });
@@ -123,7 +126,8 @@ const register = (dispatch) => async ({ name, email, password, profileAvatar }) 
     try {
         const body = { name, email, password, profileAvatar };
         const response = await axiosInstance.post('/auth/Register', body);
-        const { token, userId } = response.data;
+        const { token, userId, user } = response.data;
+
         // Store user data in cookies
         Cookies.set('authToken', token, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
         Cookies.set('userEmail', email, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
@@ -131,7 +135,7 @@ const register = (dispatch) => async ({ name, email, password, profileAvatar }) 
         Cookies.set('name', name, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
         Cookies.set('profileAvatar', profileAvatar, { expires: 7, path: '/' });
 
-        dispatch({ type: 'register', payload: { token, profileAvatar } });
+        dispatch({ type: 'register', payload: { token, user } });
         dispatch({ type: 'add_email', payload: email });
     } catch (e) {
         dispatch({ type: 'add_error', payload: 'Something went wrong during registration' });
@@ -146,8 +150,7 @@ const signIn = (dispatch) => async ({ email, password }) => {
     try {
         const response = await axiosInstance.post('/auth/Login', { email, password });
 
-        // Extract data from response
-        const { token, profileAvatar, name, userId } = response.data;
+        const { token, profileAvatar, name, userId, favorites } = response.data;
 
         if (!response.data.email) {
             throw new Error('Email not returned from the server');
@@ -158,11 +161,9 @@ const signIn = (dispatch) => async ({ email, password }) => {
         if (userId) Cookies.set('userId', userId, { expires: 7, path: '/', sameSite: 'Strict' });
         if (profileAvatar) Cookies.set('profileAvatar', profileAvatar, { expires: 7, path: '/', sameSite: 'Strict' });
         if (name) Cookies.set('name', name, { expires: 7, path: '/', sameSite: 'Strict' });
-        // Dispatch actions
-        dispatch({ type: 'sign_in', payload: { token } });
-        dispatch({ type: 'add_email', payload: email });
 
-        return Promise.resolve(); // Return a resolved Promise on success
+        dispatch({ type: 'sign_in', payload: { token, user: { name, profileAvatar, favorites } } });
+        dispatch({ type: 'add_email', payload: email });
     } catch (e) {
         dispatch({ type: 'add_error', payload: 'Invalid credentials' });
     } finally {
@@ -170,13 +171,12 @@ const signIn = (dispatch) => async ({ email, password }) => {
     }
 };
 
-
 // Sign out the user
 const signOut = (dispatch) => () => {
     Cookies.remove('authToken');
     Cookies.remove('userEmail');
     Cookies.remove('userId');
-    Cookies.remove('name')
+    Cookies.remove('name');
     Cookies.remove('profileAvatar');
     Cookies.remove('searchTerm');
     dispatch({ type: 'sign_out' });

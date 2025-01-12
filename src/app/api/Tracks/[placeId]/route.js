@@ -29,6 +29,7 @@ export async function GET(req, { params }) {
                 ? track.images
                 : ['https://via.placeholder.com/300x300?text=No+Image'],
             rating: track.rating || 'N/A',
+            type: track.type
         };
         return NextResponse.json(trackDetails);
     } catch (error) {

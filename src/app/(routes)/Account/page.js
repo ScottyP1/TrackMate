@@ -2,33 +2,38 @@
 import { useState, useEffect, useContext } from "react";
 import { Context as AuthContext } from "@/context/AuthContext";
 import { Context as TrackContext } from "@/context/TrackContext";
+import Cookies from "js-cookie";
 import { FaPen } from "react-icons/fa";
+import { useRouter } from 'next/router';  // Import useRouter
+
 import { TrackCard } from "@/components/Track/TrackCard";
 import AvatarList from "@/components/AvatarList";
-import Cookies from "js-cookie";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';  // Import the toast styles
 
 export default function Account() {
-    const { state: authState, updateUser } = useContext(AuthContext);
+    const { state: authState, updateUser, loadTokenAndUser } = useContext(AuthContext);
     const { state: trackState, fetchFavoriteTracks } = useContext(TrackContext);
     const [formData, setFormData] = useState({ name: '', email: '', profileAvatar: '' });
     const [menu, setMenu] = useState(false);
 
     // Fetch favorite tracks if the user has favorites
     useEffect(() => {
-        if (authState.user) {
-            setFormData({
-                name: authState.user.name || '',
-                email: authState.user.email || '',
-                profileAvatar: authState.user.profileAvatar || ''  // Ensure we use the avatar from authState
-            });
+        // Load token and user information
+        loadTokenAndUser();
 
-            if (authState.user.favorites && authState.user.favorites.length > 0) {
-                fetchFavoriteTracks(authState.user.favorites); // Fetch the favorite tracks
-            }
+        // Set the form data
+        setFormData({
+            name: Cookies.get('name') || '',
+            email: Cookies.get('userEmail') || '',
+            profileAvatar: Cookies.get('profileAvatar') || ''
+        });
+
+        // If the user has favorites, fetch them
+        if (authState.user) {
+            fetchFavoriteTracks(authState.user.favorites);
         }
-    }, [authState.user?.favorites, authState.user]);
+    }, []);  // Ensure it runs when authState.user changes
 
     const onSelect = (avatar) => {
         const cleanedPath = avatar.src
@@ -49,10 +54,10 @@ export default function Account() {
         updateUser({ email, updates });  // Call your update function
         toast.success('Profile updated successfully!', {
             position: "top-center", // Where the toast appears
-            autoClose: 1000, // Toast disappears after 5 seconds
-            hideProgressBar: true, // Shows a progress bar
+            autoClose: 1000, // Toast disappears after 1 second
+            hideProgressBar: true, // Hides the progress bar
             closeOnClick: true, // Close the toast when clicked
-            pauseOnHover: false, // Pause on hover
+            pauseOnHover: false, // No pause on hover
             draggable: true, // Enable drag
             theme: "dark" // Light theme for toast
         });
@@ -63,7 +68,6 @@ export default function Account() {
         <div className="mt-24 p-4">
             {/* Toast Notifications Container */}
             <ToastContainer />
-
             {/* User Info Card */}
             {authState.user &&
                 <div className="bg-black/[.8] p-6 rounded-lg shadow-lg mb-8">
@@ -78,7 +82,7 @@ export default function Account() {
                             {/* Pencil Icon */}
                             <button
                                 onClick={() => setMenu(!menu)}
-                                className="absolute top-0 right-0 md:right-2 bg-gray-700 p-1 rounded-full text-white"
+                                className="absolute top-0 right-0  bg-gray-700 p-1 rounded-full text-white"
                                 style={{ transform: 'translate(20%, -20%)' }}
                             >
                                 <FaPen />
@@ -94,7 +98,7 @@ export default function Account() {
                         {/* Fav Tracks */}
                         <div className="flex flex-col items-center ">
                             <h2 className="text-white text-md md:text-2xl font-semibold">Favorites</h2>
-                            <p className="text-gray-400 text-sm md:text-xl">{authState.user?.favorites.length}</p>
+                            <p className="text-gray-400 text-sm md:text-xl">{authState.user?.favorites?.length}</p>
                         </div>
 
                         {/* Posted Tracks */}

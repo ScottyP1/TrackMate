@@ -21,7 +21,7 @@ export const TrackCard = ({ track }) => {
                 />
             </Link>
             <div className="p-4">
-                <h2 className="text-white text-lg font-bold">{track.name}</h2>
+                <h2 className="text-white text-lg font-bold">{track.name} {track.type && <span className='border-2 border-blue-500 text-blue-500 rounded-full px-1 text-sm ml-4'>{track.type}</span>}</h2>
                 <p className="text-gray-400 text-sm">{track.address}</p>
                 <div className="text-yellow-400 font-semibold flex justify-between items-center">
                     <span>Rating: {track.rating || 'N/A'}</span>

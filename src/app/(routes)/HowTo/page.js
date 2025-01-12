@@ -16,7 +16,7 @@ export default function HowTo() {
                 </Link>
             </div>
 
-            <h1 className="text-white text-4xl mt-24 tracking-[5px] underline">Lets Begin</h1>
+            <h1 className="text-white text-4xl mt-12 tracking-[5px] underline">Lets Begin</h1>
 
             <div className="mt-12">
                 <h1 className="text-3xl font-semibold ">Step 1</h1>

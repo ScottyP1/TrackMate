@@ -71,7 +71,6 @@ export async function GET(request) {
         if (tracks.length === 0) {
             return NextResponse.json({ message: 'No tracks found in this area' }, { status: 404 });
         }
-
         return NextResponse.json(tracks);
 
     } catch (error) {

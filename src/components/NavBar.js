@@ -151,13 +151,30 @@ function NavBar() {
                                 onClose={handleUserMenuClose}
                                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                                 transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                                PaperProps={{
+                                    style: {
+                                        backgroundColor: '#000000', // Black background
+                                        color: '#ffffff', // White text for contrast
+                                        borderRadiusBottom: '8px', // Rounded corners
+                                        marginTop: '4px', // Add spacing below the navbar
+                                    },
+                                }}
                             >
-                                <MenuItem onClick={() => handleUserMenuClose()}>
-                                    <Link href="/Account">Account</Link>
-                                </MenuItem>
-                                <MenuItem onClick={() => handleUserMenuClose()}>
-                                    <Link href="/Inbox">Inbox</Link>
-                                </MenuItem>
+                                <Link href="/Account">
+                                    <MenuItem onClick={() => handleUserMenuClose()}>
+                                        Account
+                                    </MenuItem>
+                                </Link>
+                                <Link href="/PrivateTrack">
+                                    <MenuItem onClick={() => handleUserMenuClose()}>
+                                        Private Track
+                                    </MenuItem>
+                                </Link>
+                                <Link href="/Inbox">
+                                    <MenuItem onClick={() => handleUserMenuClose()}>
+                                        Inbox
+                                    </MenuItem>
+                                </Link>
                                 <MenuItem onClick={handleSignOut}>Log out</MenuItem>
                             </Menu>
                         </>

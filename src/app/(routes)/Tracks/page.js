@@ -2,6 +2,7 @@
 import { useContext, useEffect } from 'react';
 
 import DOMPurify from 'dompurify';
+import Link from 'next/link';
 
 import { Context as TrackContext } from '@/context/TrackContext';
 import SearchBar from '@/components/SearchBar';
@@ -50,12 +51,11 @@ export default function Tracks() {
             <div className="w-full min-w-xl mx-auto mb-4">
                 <SearchBar onSearch={handleSearch} />
             </div>
-
             {state.errorMessage && (
                 <p className="text-center text-lg text-red-500 mt-4">{state.errorMessage}</p>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 mt-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 mt-4">
                 {renderTrackCardOrSkeleton()}
             </div>
         </div>
