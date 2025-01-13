@@ -1,13 +1,13 @@
 'use client';
-
 import { useState, useEffect, useContext, useRef } from "react";
-import { Context as AuthContext } from "@/context/AuthContext";
-import { Context as TrackContext } from "@/context/TrackContext";
 import { usePathname, useRouter } from 'next/navigation';
 import Cookies from "js-cookie";
+
+import { Context as AuthContext } from "@/context/AuthContext";
+import { Context as TrackContext } from "@/context/TrackContext";
+
 import { TrackCard } from "@/components/Track/TrackCard";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import PageSpinner from "@/components/spinners/PageSpinner";
 
 export default function UserProfile() {
     const { state: authState, fetchUserProfile } = useContext(AuthContext);
@@ -16,10 +16,10 @@ export default function UserProfile() {
     const router = useRouter();
 
     const pathname = usePathname();
-    const userIdFromUrl = pathname.split('/').pop();  // Assuming the URL is /account/[userId]
+    const userIdFromUrl = pathname.split('/').pop();
 
     const loggedInUserId = Cookies.get('userId');
-    const initialFetchDone = useRef(false);  // Ref to track the initial fetch state
+    const initialFetchDone = useRef(false);
 
     // Redirect to /account if the user is viewing their own profile
     useEffect(() => {
@@ -48,8 +48,6 @@ export default function UserProfile() {
 
     return (
         <div className="mt-24 p-4">
-            {/* Toast Notifications Container */}
-            <ToastContainer />
 
             {/* User Info Card */}
             {user ? (
@@ -84,7 +82,7 @@ export default function UserProfile() {
                     </div>
                 </div>
             ) : (
-                <p className="text-white">Loading...</p>
+                <PageSpinner />
             )}
 
             {/* Favorite Tracks Section */}

@@ -14,7 +14,6 @@ import Image from 'next/image';
 import Avatar from '@mui/material/Avatar';
 import { Context as AuthContext } from '@/context/AuthContext';
 import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';  // Import useRouter hook
 
 const pages = ['Home', 'Tracks', 'About', 'HowTo'];
 
@@ -24,7 +23,6 @@ function NavBar() {
     const [userAvatar, setUserAvatar] = React.useState('/Avatars/default-avatar.png');  // Default avatar
     const { state, loadTokenAndUser, signOut } = React.useContext(AuthContext);
     const pathname = usePathname();
-    const router = useRouter();
 
     React.useEffect(() => {
         const avatarFromCookies = Cookies.get('profileAvatar'); // Read avatar from cookies

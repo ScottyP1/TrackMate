@@ -2,7 +2,6 @@ import Header from '../components/Header';
 // import GoogleMap from '../components/GoogleMap';
 // import InfoCard from '../components/InfoCard';
 
-import TrackList from '@/components/Track/TrackList';
 
 export default function Home() {
   return (
