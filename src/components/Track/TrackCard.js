@@ -25,15 +25,15 @@ export const TrackCard = ({ track }) => {
                 <p className="text-gray-400 text-sm">{track.address}</p>
                 <div className="text-yellow-400 font-semibold flex justify-between items-center">
                     <span>Rating: {track.rating || 'N/A'}</span>
-                    <span
-                        className={`cursor-pointer ${isFavorite ? 'text-red-500' : 'text-gray-400'}`}
+                    <button
+                        className={`p-3 rounded-full ${isFavorite ? 'bg-blue-500' : 'bg-gray-700'} text-white font-semibold`}
                         onClick={handleFavoriteClick}
                     >
                         {isFavorite ?
-                            <MdFavorite size={30} />
-                            : <MdOutlineFavoriteBorder size={30} />
+                            <MdFavorite size={20} />
+                            : <MdOutlineFavoriteBorder size={20} />
                         }
-                    </span>
+                    </button>
                 </div>
             </div>
         </div>

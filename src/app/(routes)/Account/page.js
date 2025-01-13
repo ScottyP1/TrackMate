@@ -4,7 +4,7 @@ import { Context as AuthContext } from "@/context/AuthContext";
 import { Context as TrackContext } from "@/context/TrackContext";
 import Cookies from "js-cookie";
 import { FaPen } from "react-icons/fa";
-import { useRouter } from 'next/router';  // Import useRouter
+import { redirect } from 'next/navigation'
 
 import { TrackCard } from "@/components/Track/TrackCard";
 import AvatarList from "@/components/AvatarList";
@@ -21,7 +21,10 @@ export default function Account() {
     useEffect(() => {
         // Load token and user information
         loadTokenAndUser();
-
+        const token = Cookies.get('authToken')
+        if (!token) {
+            redirect('/')
+        }
         // Set the form data
         setFormData({
             name: Cookies.get('name') || '',
@@ -33,7 +36,7 @@ export default function Account() {
         if (authState.user) {
             fetchFavoriteTracks(authState.user.favorites);
         }
-    }, []);  // Ensure it runs when authState.user changes
+    }, [authState.favoriteTracks]);  // Ensure it runs when authState.user changes
 
     const onSelect = (avatar) => {
         const cleanedPath = avatar.src
@@ -158,7 +161,7 @@ export default function Account() {
                 <div className="mt-8">
                     <h1 className="text-white text-center text-2xl mb-8">Favorited Tracks</h1>
 
-                    {!trackState.loading && trackState.favoriteTracks?.length > 0 ? (
+                    {trackState.favoriteTracks?.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
                             {trackState.favoriteTracks.map((track) => (
                                 <TrackCard key={track.id} track={track} />

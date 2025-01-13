@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import { redirect } from 'next/navigation'
 
 export default function PrivateTrack() {
     const [formData, setFormData] = useState({
@@ -13,6 +14,10 @@ export default function PrivateTrack() {
     useEffect(() => {
         // Set trackOwner from cookie if available
         const userEmail = Cookies.get('userEmail');
+        const token = Cookies.get('authToken')
+        if (!token) {
+            redirect('/')
+        }
         if (userEmail) {
             setFormData((prevData) => ({
                 ...prevData,
