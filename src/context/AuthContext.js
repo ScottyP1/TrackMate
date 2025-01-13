@@ -77,6 +77,25 @@ const loadTokenAndUser = (dispatch) => () => {
     }
 };
 
+const fetchUserProfile = (dispatch) => async (userId) => {
+    dispatch({ type: 'set_loading', payload: true });
+    try {
+        // Correct URL for dynamic route
+        const response = await axiosInstance.get(`/Account/${userId}`);  // Use the correct route
+        const user = response.data.user;
+
+        dispatch({ type: 'fetch_user', payload: user });
+    } catch (error) {
+        console.error("Error fetching user profile:", error);
+        dispatch({ type: 'add_error', payload: 'Failed to fetch user profile.' });
+    } finally {
+        dispatch({ type: 'set_loading', payload: false });
+    }
+};
+
+
+
+
 // Update favorites in the user's profile
 const updateFavorites = (dispatch) => async (email, favorites) => {
     dispatch({ type: 'set_loading', payload: true });
@@ -190,6 +209,9 @@ const clearError = (dispatch) => () => {
 // Export the context provider and actions
 export const { Provider, Context } = createDataContext(
     authReducer,
-    { register, signIn, signOut, clearError, loadTokenAndUser, updateUser, updateFavorites },
+    {
+        register, signIn, signOut, fetchUserProfile // Add to the actions
+        , clearError, loadTokenAndUser, updateUser, updateFavorites
+    },
     { token: null, user: null, favorites: [], errorMessage: '', loading: false }
 );

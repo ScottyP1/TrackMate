@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { FaUser } from "react-icons/fa";
+import { FaUser, FaTrash } from "react-icons/fa";
 import ReplyForm from "./ReplyForm";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { FaTrash } from "react-icons/fa";
+import Link from "next/link"; // Import the Link component
 
 export default function CommentItem({ comment, userName, onCommentDelete }) {
     const [userHasLiked, setUserHasLiked] = useState(false);
@@ -89,11 +89,13 @@ export default function CommentItem({ comment, userName, onCommentDelete }) {
             {/* User Info */}
             <div className="flex items-center space-x-3">
                 {comment.userId?.profileAvatar ? (
-                    <img
-                        src={comment.userId.profileAvatar} // Ensure this is populated
-                        alt="User Avatar"
-                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
-                    />
+                    <Link href={`/Account/${comment.userId._id}`}> {/* Add Link to user's profile */}
+                        <img
+                            src={comment.userId.profileAvatar} // Ensure this is populated
+                            alt="User Avatar"
+                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover cursor-pointer"
+                        />
+                    </Link>
                 ) : (
                     <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-600 rounded-full flex items-center justify-center">
                         <FaUser className="text-gray-400 text-sm sm:text-lg" />
@@ -123,6 +125,5 @@ export default function CommentItem({ comment, userName, onCommentDelete }) {
                 />
             </div>
         </div>
-
     );
 }
