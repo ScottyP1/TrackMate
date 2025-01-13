@@ -34,9 +34,10 @@ export default function Account() {
 
         // If the user has favorites, fetch them
         if (authState.user) {
-            fetchFavoriteTracks(authState.user.favorites);
+            console.log(authState.user)
+            fetchFavoriteTracks(authState.favorites);
         }
-    }, [authState.favoriteTracks]);  // Ensure it runs when authState.user changes
+    }, [authState.favorites]);
 
     const onSelect = (avatar) => {
         const cleanedPath = avatar.src

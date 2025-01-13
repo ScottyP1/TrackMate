@@ -15,6 +15,8 @@ const trackReducer = (state, action) => {
             return { ...state, tracks: action.payload, loading: false };
         case 'fetch_favorite_tracks':
             return { ...state, favoriteTracks: action.payload, loading: false };
+        case 'fetch_visited_user_favorite_tracks':
+            return { ...state, visitedUserFavoriteTracks: action.payload, loading: false }; // New action for visited user favorites
         case 'fetch_track':
             return { ...state, track: action.payload, loading: false };
         case 'add_error':
@@ -22,26 +24,13 @@ const trackReducer = (state, action) => {
         case 'clear_error':
             return { ...state, errorMessage: '' };
         case 'clear_tracks':
-            return { ...state, tracks: [], favoriteTracks: [] };  // Clear both tracks and favorite tracks
+            return { ...state, tracks: [], favoriteTracks: [], visitedUserFavoriteTracks: [] };  // Clear both tracks and visited user favorite tracks
         case 'handle_invalid_zip_code':
             return { ...state, tracks: [], zipCode: '', errorMessage: 'Invalid zip code. Please try again.', loading: false };
         case 'set_loading':
             return { ...state, loading: action.payload };
         default:
             return state;
-    }
-};
-
-
-// Fetch all tracks (to be called once when the app loads or on mount)
-// trackContext.js (updated fetchTracks method)
-const fetchAllTracks = (dispatch) => async () => {
-    dispatch({ type: 'set_loading', payload: true });
-    try {
-        let response = await axiosInstance.get('/Tracks');
-        dispatch({ type: 'fetch_tracks', payload: response.data });
-    } catch (e) {
-        dispatch({ type: 'add_error', payload: 'Failed to fetch tracks' });
     }
 };
 
@@ -59,21 +48,24 @@ const fetchTrackById = (dispatch) => async (placeId) => {
     }
 };
 
-const fetchFavoriteTracks = (dispatch) => async (trackIds) => {
+const fetchFavoriteTracks = (dispatch) => async (trackIds, isVisitedUser = false) => {
     dispatch({ type: 'set_loading', payload: true });
     try {
+        // Fetch track data based on IDs
         const trackPromises = trackIds.map(trackId => fetchTrackById(dispatch)(trackId));
         const trackData = await Promise.all(trackPromises);
 
-        // Log track data to inspect the fields
-
-        dispatch({ type: 'fetch_favorite_tracks', payload: trackData });
+        // Dispatch to the appropriate state based on the flag
+        if (isVisitedUser) {
+            dispatch({ type: 'fetch_visited_user_favorite_tracks', payload: trackData });
+        } else {
+            dispatch({ type: 'fetch_favorite_tracks', payload: trackData });
+        }
     } catch (error) {
         console.error('Error fetching favorite tracks:', error);
         dispatch({ type: 'add_error', payload: 'Failed to fetch favorite tracks' });
     }
 };
-
 
 
 
@@ -96,8 +88,6 @@ const fetchTracks = (dispatch) => async (searchTerm = '', radius = 10) => {
                 params: { trackName: searchTerm }
             });
         }
-
-        // If no tracks are returned, show an error message
         if (response.data.length === 0) {
             dispatch({ type: 'fetch_tracks', payload: [] });
             dispatch({ type: 'add_error', payload: 'No tracks found with the given name or zip code.' });
@@ -108,11 +98,9 @@ const fetchTracks = (dispatch) => async (searchTerm = '', radius = 10) => {
         }
     } catch (e) {
         if (e.response && e.response.status === 404) {
-            // Handle 404 error (not found)
             dispatch({ type: 'fetch_tracks', payload: [] });
             dispatch({ type: 'add_error', payload: 'No tracks found for your search. Please try again.' });
         } else {
-            // Handle other errors (e.g., network errors)
             dispatch({ type: 'add_error', payload: 'Failed to fetch tracks. Please try again later.' });
         }
     }
@@ -139,9 +127,9 @@ const setRadius = (dispatch) => (radius) => {
 
 export const { Provider, Context } = createDataContext(
     trackReducer,
-    { setZipCode, setRadius, fetchAllTracks, fetchTrackById, fetchFavoriteTracks, fetchTracks, clearTracks, clearError, handleInvalidZipCode },
+    { setZipCode, setRadius, fetchTrackById, fetchFavoriteTracks, fetchTracks, clearTracks, clearError, handleInvalidZipCode },
     {
-        tracks: [], favoriteTracks: [],
+        tracks: [], favoriteTracks: [], visitedUserFavoriteTracks: [],
         track: null, zipCode: null, radius: null, errorMessage: '', loading: false
     }
 );

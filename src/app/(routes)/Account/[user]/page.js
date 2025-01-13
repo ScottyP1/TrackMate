@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useContext } from "react";
 import { usePathname, useRouter } from 'next/navigation';
 import Cookies from "js-cookie";
 
@@ -10,45 +10,45 @@ import { TrackCard } from "@/components/Track/TrackCard";
 import PageSpinner from "@/components/spinners/PageSpinner";
 
 export default function UserProfile() {
-    const { state: authState, fetchUserProfile } = useContext(AuthContext);
+    const { state: authState, fetchOtherUserProfile } = useContext(AuthContext);
     const { state: trackState, fetchFavoriteTracks } = useContext(TrackContext);
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(null);  // State to hold the visited user
     const router = useRouter();
 
     const pathname = usePathname();
     const userIdFromUrl = pathname.split('/').pop();
-
     const loggedInUserId = Cookies.get('userId');
-    const initialFetchDone = useRef(false);
 
-    // Redirect to /account if the user is viewing their own profile
+    // This useEffect handles user profile fetch and redirect logic
     useEffect(() => {
+        // Prevent redirect and fetch if we're visiting our own profile
         if (userIdFromUrl === loggedInUserId) {
-            router.push('/Account');  // Redirect to your own account page
+            router.push('/Account');
+            return;
         }
-    }, [userIdFromUrl, loggedInUserId, router]);
 
-    // Fetch the user profile only if the URL's userId is different from the logged-in userId
-    useEffect(() => {
-        if (!initialFetchDone.current && userIdFromUrl !== loggedInUserId) {
-            initialFetchDone.current = true; // Ensure this fetch only happens once
-            fetchUserProfile(userIdFromUrl); // Fetch the other user's profile
-        }
-    }, [userIdFromUrl, loggedInUserId, fetchUserProfile]);
+        // Fetch user profile only once
+        fetchOtherUserProfile(userIdFromUrl)
+            .catch((error) => {
+                console.error("Error fetching user profile:", error);
+            });
+    }, []);
 
-    // Set user data and fetch favorite tracks once the user profile is fetched
+    // This useEffect will update the user data only if the visitedUser data changes
     useEffect(() => {
-        if (authState.user && authState.user._id === userIdFromUrl && user !== authState.user) {
-            setUser(authState.user);  // Only set the user if it's a new user profile
-            if (authState.user.favorites?.length) {
-                fetchFavoriteTracks(authState.user.favorites); // Fetch favorite tracks if available
-            }
+        const visitedUser = authState.visitedUser;
+        if (visitedUser) {
+            setUser(visitedUser);
         }
-    }, [authState.user, userIdFromUrl, fetchFavoriteTracks, user]);
+
+        // Fetch the visited user's favorite tracks if any
+        if (visitedUser?.favorites?.length) {
+            fetchFavoriteTracks(visitedUser.favorites, true);  // Pass `true` to indicate it's the visited user's favorites
+        }
+    }, [authState.visitedUser]);
 
     return (
         <div className="mt-24 p-4">
-
             {/* User Info Card */}
             {user ? (
                 <div className="bg-black/[.8] p-6 rounded-lg shadow-lg mb-8">
@@ -90,9 +90,9 @@ export default function UserProfile() {
                 <div className="mt-8">
                     <h1 className="text-white text-center text-2xl mb-8">Favorited Tracks</h1>
 
-                    {trackState.favoriteTracks?.length > 0 ? (
+                    {trackState.visitedUserFavoriteTracks?.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
-                            {trackState.favoriteTracks.map((track) => (
+                            {trackState.visitedUserFavoriteTracks.map((track) => (
                                 <TrackCard key={track.id} track={track} />
                             ))}
                         </div>

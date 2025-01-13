@@ -18,43 +18,30 @@ const authReducer = (state, action) => {
         case 'fetch_user':
             return { ...state, user: action.payload };
 
+        case 'fetch_other_user':
+            return { ...state, visitedUser: action.payload };  // Store the visited user's profile
+
         case 'register':
         case 'sign_in':
-            return {
-                ...state,
-                token: action.payload.token,
-                errorMessage: '',
-                user: action.payload.user || state.user, // Add user info if available
-            };
+            return { ...state, token: action.payload.token, errorMessage: '', user: action.payload.user || state.user, };
 
         case 'add_email':
             return { ...state, userEmail: action.payload };
 
         case 'sign_out':
-            return {
-                ...state,
-                token: null,
-                errorMessage: '',
-                userEmail: '',
-                user: null,
-            };
+            return { ...state, token: null, errorMessage: '', userEmail: '', user: null, visitedUser: null };
 
         case 'update_favorites':
-            return {
-                ...state,
-                user: { ...state.user, favorites: action.payload },
-            };
+            return { ...state, user: { ...state.user, favorites: action.payload }, };
 
         case 'update_user':
-            return {
-                ...state,
-                user: { ...state.user, ...action.payload },
-            };
+            return { ...state, user: { ...state.user, ...action.payload }, };
 
         default:
             return state;
     }
 };
+
 
 const loadTokenAndUser = (dispatch) => () => {
     const token = Cookies.get('authToken');
@@ -77,14 +64,12 @@ const loadTokenAndUser = (dispatch) => () => {
     }
 };
 
-const fetchUserProfile = (dispatch) => async (userId) => {
+const fetchOtherUserProfile = (dispatch) => async (user) => {
     dispatch({ type: 'set_loading', payload: true });
     try {
-        // Correct URL for dynamic route
-        const response = await axiosInstance.get(`/Account/${userId}`);  // Use the correct route
-        const user = response.data.user;
-
-        dispatch({ type: 'fetch_user', payload: user });
+        const response = await axiosInstance.get(`/Account/${user}`);
+        const userData = response.data.user;
+        dispatch({ type: 'fetch_other_user', payload: userData });
     } catch (error) {
         console.error("Error fetching user profile:", error);
         dispatch({ type: 'add_error', payload: 'Failed to fetch user profile.' });
@@ -92,9 +77,6 @@ const fetchUserProfile = (dispatch) => async (userId) => {
         dispatch({ type: 'set_loading', payload: false });
     }
 };
-
-
-
 
 // Update favorites in the user's profile
 const updateFavorites = (dispatch) => async (email, favorites) => {
@@ -210,8 +192,7 @@ const clearError = (dispatch) => () => {
 export const { Provider, Context } = createDataContext(
     authReducer,
     {
-        register, signIn, signOut, fetchUserProfile // Add to the actions
-        , clearError, loadTokenAndUser, updateUser, updateFavorites
+        fetchOtherUserProfile, register, signIn, signOut, clearError, loadTokenAndUser, updateUser, updateFavorites
     },
-    { token: null, user: null, favorites: [], errorMessage: '', loading: false }
+    { token: null, user: null, favorites: [], visitedUser: null, errorMessage: '', loading: false }
 );
