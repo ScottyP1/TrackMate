@@ -82,7 +82,7 @@ export default function Account() {
                         {/* Avatar */}
                         <div className="relative flex flex-col items-center ">
                             <img
-                                src={Cookies.get('profileAvatar') || '/default-avatar.png'}
+                                src={authstate.profileAvatar || '/default-avatar.png'}
                                 alt="User Avatar"
                                 className="w-[60px] h-[60px] md:w-20 md:h-20 rounded-full border-2 border-blue-500"
                             />
