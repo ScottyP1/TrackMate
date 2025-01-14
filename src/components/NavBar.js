@@ -147,28 +147,31 @@ function NavBar() {
                                     },
                                 }}
                             >
-                                <Link href="/Account">
-                                    <MenuItem onClick={() => handleUserMenuClose()}>
+                                <MenuItem onClick={() => handleUserMenuClose()}>
+                                    <Link href="/Account">
                                         Account
-                                    </MenuItem>
-                                </Link>
-                                <Link href="/PrivateTrack">
-                                    <MenuItem onClick={() => handleUserMenuClose()}>
+                                    </Link>
+                                </MenuItem>
+
+                                <MenuItem onClick={() => handleUserMenuClose()}>
+                                    <Link href="/PrivateTrack">
                                         Private Track
-                                    </MenuItem>
-                                </Link>
-                                <Link href="/Inbox">
-                                    <MenuItem onClick={() => handleUserMenuClose()}>
+                                    </Link>
+                                </MenuItem>
+
+                                <MenuItem onClick={() => handleUserMenuClose()}>
+                                    <Link href="/Inbox">
                                         Inbox
-                                    </MenuItem>
-                                </Link>
+                                    </Link>
+                                </MenuItem>
+
                                 <MenuItem onClick={handleSignOut}>Log out</MenuItem>
                             </Menu>
                         </>
                     )}
                 </Box>
             </Toolbar>
-        </AppBar>
+        </AppBar >
     );
 }
 
