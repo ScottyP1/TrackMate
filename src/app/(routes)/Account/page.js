@@ -30,17 +30,20 @@ export default function Account() {
     }, []);
 
     useEffect(() => {
-        if (authState.user) {
+        if (authState?.user) {
             setFormData({
                 name: authState.user.name || '',
                 email: authState.user.email || '',
                 profileAvatar: authState.user.profileAvatar || '',
             });
 
-            // Fetch favorite tracks if the user is loaded
-            fetchFavoriteTracks(authState.user.favorites);
+            // Check if user has favorites before trying to fetch them
+            if (authState.user.favorites) {
+                fetchFavoriteTracks(authState.user.favorites);
+            }
         }
-    }, [authState.user.favorites]);  // Ensure this effect runs when authState.user changes
+    }, [authState]);  // Run the effect when authState changes
+
 
     const onSelect = (avatar) => {
         const cleanedPath = avatar.src

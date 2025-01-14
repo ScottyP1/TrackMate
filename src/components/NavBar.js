@@ -13,7 +13,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Image from 'next/image';
 import Avatar from '@mui/material/Avatar';
 import { Context as AuthContext } from '@/context/AuthContext';
-import Cookies from 'js-cookie';
 
 const pages = ['Home', 'Tracks', 'About', 'Contact'];
 
