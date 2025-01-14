@@ -1,6 +1,7 @@
-'use client'
+'use client';
+
 import { useState, useEffect } from 'react';
-import { FaSearchLocation } from 'react-icons/fa';
+import { FaSearchLocation, FaTimesCircle } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 
 export default function SearchBar({ onSearch }) {
@@ -29,35 +30,50 @@ export default function SearchBar({ onSearch }) {
         }
     };
 
+    // Clear search input
+    const handleClear = () => {
+        setSearchTerm('');
+    };
+
     return (
-        <form onSubmit={handleSubmit} className="flex items-center w-1/2 justify-center mx-auto min-w-[300px] md:min-w-[880px] 2xl:min-w-[900px]">
+        <form onSubmit={handleSubmit} className="relative flex flex-col md:flex-row items-center w-full md:w-2/3  justify-center mx-auto min-w-[280px] p-4 bg-gray-900 rounded-lg shadow-lg space-y-4 md:space-y-0 md:space-x-4">
+
+            {/* Search Icon */}
             <FaSearchLocation
-                className="absolute left-[30px] md:left-[325px] 2xl:left-[500px] text-white"
+                className="absolute left-6 top-[57px] lg:left-10 lg:top-1/2 transform -translate-y-1/2 text-white"
                 size={30}
             />
+
+            {/* Search Input */}
             <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)} // Update the search term on change
-                className="flex-grow w-[300px] rounded-r-[0px] rounded-l-lg bg-gray-800 placeholder:text-md md:placeholder:text-lg text-white p-3 pl-12 placeholder-white focus:outline-none focus:ring-2 focus:ring-blue-300 border-r-0"
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={(e) => e.target.placeholder = ""}
+                onBlur={(e) => e.target.placeholder = "Enter track name or zip code"}
+                className="flex-grow rounded-lg bg-gray-800 text-white p-3 pl-12 w-full placeholder:text-md placeholder-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-80 transition-all"
                 placeholder="Enter track name or zip code"
                 aria-label="Search for a track"
             />
+
+            {/* Radius Dropdown */}
             <select
                 value={radius}
                 onChange={(e) => setRadiusState(e.target.value)}
-                className="w-[90px] md:w-[105px] h-[48px] rounded-l-[0px] bg-gray-800 text-white p-3 focus:outline-none focus:ring-2 focus:ring-blue-300 border-l-0 border-r-0"
+                className="w-full md:w-[120px] h-[48px] rounded-lg bg-gray-800 text-white p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-80 transition-all"
                 aria-label="Select radius"
             >
-                <option value="">Select Radius</option>
+                <option value="">Radius</option>
                 <option value="10">10 miles</option>
                 <option value="25">25 miles</option>
                 <option value="50">50 miles</option>
                 <option value="100">100 miles</option>
             </select>
+
+            {/* Submit Button */}
             <button
                 type="submit"
-                className="bg-gray-800 text-white w-[100px] rounded-r-lg p-3 hover:bg-blue-100 transition-all focus:outline-none"
+                className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white w-full md:w-[100px] h-[48px] rounded-lg p-3 hover:bg-blue-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-80"
             >
                 Go
             </button>

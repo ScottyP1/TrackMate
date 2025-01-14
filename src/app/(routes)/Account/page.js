@@ -1,15 +1,17 @@
 'use client';
+
 import { useState, useEffect, useContext } from "react";
 import { Context as AuthContext } from "@/context/AuthContext";
 import { Context as TrackContext } from "@/context/TrackContext";
 import Cookies from "js-cookie";
 import { FaPen } from "react-icons/fa";
-import { redirect } from 'next/navigation'
+import { redirect } from 'next/navigation';
 
 import { TrackCard } from "@/components/Track/TrackCard";
+import { TrackCardSkeleton } from "@/components/Track/TrackCardSkeleton";  // Import TrackCardSkeleton
 import AvatarList from "@/components/AvatarList";
 import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';  // Import the toast styles
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Account() {
     const { state: authState, updateUser, loadTokenAndUser } = useContext(AuthContext);
@@ -19,30 +21,31 @@ export default function Account() {
 
     // Fetch favorite tracks if the user has favorites
     useEffect(() => {
-        // Load token and user information
         loadTokenAndUser();
-        const token = Cookies.get('authToken')
-        if (!token) {
-            redirect('/')
-        }
-        // Set the form data
-        setFormData({
-            name: Cookies.get('name') || '',
-            email: Cookies.get('userEmail') || '',
-            profileAvatar: Cookies.get('profileAvatar') || ''
-        });
 
-        // If the user has favorites, fetch them
-        if (authState.user) {
-            console.log(authState.user)
-            fetchFavoriteTracks(authState.favorites);
+        const token = Cookies.get('authToken');
+        if (!token) {
+            redirect('/');
         }
-    }, [authState.favorites]);
+    }, []);
+
+    useEffect(() => {
+        if (authState.user) {
+            setFormData({
+                name: authState.user.name || '',
+                email: authState.user.email || '',
+                profileAvatar: authState.user.profileAvatar || '',
+            });
+
+            // Fetch favorite tracks if the user is loaded
+            fetchFavoriteTracks(authState.user.favorites);
+        }
+    }, [authState.user.favorites]);  // Ensure this effect runs when authState.user changes
 
     const onSelect = (avatar) => {
         const cleanedPath = avatar.src
             .replace('/_next/static/media', '/Avatars')  // Replace the path part
-            .split('.')
+            .split('.');
         setFormData((prevData) => ({ ...prevData, profileAvatar: `${cleanedPath[0]}.${cleanedPath[2]}` }));
     };
 
@@ -57,13 +60,13 @@ export default function Account() {
 
         updateUser({ email, updates });  // Call your update function
         toast.success('Profile updated successfully!', {
-            position: "top-center", // Where the toast appears
-            autoClose: 1000, // Toast disappears after 1 second
-            hideProgressBar: true, // Hides the progress bar
-            closeOnClick: true, // Close the toast when clicked
-            pauseOnHover: false, // No pause on hover
-            draggable: true, // Enable drag
-            theme: "dark" // Light theme for toast
+            position: "top-center",
+            autoClose: 1000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            theme: "dark"
         });
         setMenu(false);  // Close the update form after submission
     };
@@ -86,7 +89,7 @@ export default function Account() {
                             {/* Pencil Icon */}
                             <button
                                 onClick={() => setMenu(!menu)}
-                                className="absolute top-0 right-0  bg-gray-700 p-1 rounded-full text-white"
+                                className="absolute top-0 right-0 bg-gray-700 p-1 rounded-full text-white"
                                 style={{ transform: 'translate(20%, -20%)' }}
                             >
                                 <FaPen />
@@ -115,10 +118,8 @@ export default function Account() {
             }
 
             {/* Profile Update Form */}
-            {
-                menu &&
+            {menu &&
                 <form onSubmit={handleSubmit} className="text-white bg-black/[.8] p-6 rounded-lg shadow-lg">
-                    {/* Avatar List */}
                     <h2 className="text-center text-2xl mb-6">Select new avatar</h2>
                     <AvatarList selectedAvatar={formData.profileAvatar} onSelect={onSelect} classes='justify-self-center' />
 
@@ -162,7 +163,14 @@ export default function Account() {
                 <div className="mt-8">
                     <h1 className="text-white text-center text-2xl mb-8">Favorited Tracks</h1>
 
-                    {trackState.favoriteTracks?.length > 0 ? (
+                    {trackState.loading ? (
+                        // Show skeleton cards while loading
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {Array(4).fill(null).map((_, index) => (
+                                <TrackCardSkeleton key={index} />
+                            ))}
+                        </div>
+                    ) : trackState.favoriteTracks?.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
                             {trackState.favoriteTracks.map((track) => (
                                 <TrackCard key={track.id} track={track} />

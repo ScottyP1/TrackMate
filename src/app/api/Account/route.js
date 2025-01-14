@@ -43,7 +43,7 @@ export async function PATCH(req) {
         }
 
         // Validate allowed fields (name, password, favorites)
-        const allowedUpdates = ["name", "password", "favorites", 'profileAvatar'];
+        const allowedUpdates = ["name", "password", "favorites", "profileAvatar"];
         const keysToUpdate = Object.keys(updates);
         const isValidUpdate = keysToUpdate.every((key) => allowedUpdates.includes(key));
 
@@ -51,17 +51,9 @@ export async function PATCH(req) {
             return new Response("Invalid fields in updates", { status: 400 });
         }
 
-        // Handle favorites: If it's an array of objects, extract the trackId
+        // Handle favorites: Just directly assign the favorites array (no need for extraction)
         if (updates.favorites && Array.isArray(updates.favorites)) {
-            const extractedFavorites = updates.favorites.map(fav => {
-                // If the item is an object with a trackId, extract the trackId
-                if (fav && fav.trackId) {
-                    return fav.trackId; // Only store the trackId as a string
-                }
-                return fav; // If it's already a string, keep it
-            });
-
-            updates.favorites = extractedFavorites; // Assign the extracted array
+            updates.favorites = updates.favorites;  // Directly use the provided favorites array
         }
 
         // Fetch the user by email
@@ -70,12 +62,6 @@ export async function PATCH(req) {
         if (!user) {
             return new Response("User not found", { status: 404 });
         }
-
-        // Handle password update if present
-        // if (updates.password) {
-        //     const salt = await bcrypt.genSalt(10);
-        //     updates.password = await bcrypt.hash(updates.password, salt);
-        // }
 
         // Update the user (ignoring favorites field since we handled it separately)
         const updatedUser = await User.findOneAndUpdate(

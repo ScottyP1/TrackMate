@@ -3,7 +3,6 @@ import createDataContext from "@/context/createDataContext";
 import axiosInstance from "@/api/axios";
 import Cookies from 'js-cookie';
 
-// Reducer function to manage state
 const authReducer = (state, action) => {
     switch (action.type) {
         case 'add_error':
@@ -16,54 +15,137 @@ const authReducer = (state, action) => {
             return { ...state, loading: action.payload };
 
         case 'fetch_user':
-            return { ...state, user: action.payload };
+            return {
+                ...state,
+                user: {
+                    ...action.payload.user,  // Merge any existing user data
+                    name: action.payload.name,
+                    email: action.payload.email,
+                    profileAvatar: action.payload.profileAvatar,
+                    favorites: action.payload.favorites || []
+                }
+            };
 
         case 'fetch_other_user':
-            return { ...state, visitedUser: action.payload };  // Store the visited user's profile
+            return { ...state, visitedUser: action.payload };
 
         case 'register':
         case 'sign_in':
-            return { ...state, token: action.payload.token, errorMessage: '', user: action.payload.user || state.user, };
-
-        case 'add_email':
-            return { ...state, userEmail: action.payload };
+            return {
+                ...state,
+                token: action.payload.token,
+                errorMessage: '',
+                user: {
+                    ...action.payload.user,  // Merge any existing user data
+                    name: action.payload.userData.name,
+                    email: action.payload.userData.email,
+                    profileAvatar: action.payload.userData.profileAvatar,
+                    favorites: action.payload.userData.favorites || []  // Safe fallback for favorites
+                }
+            };
 
         case 'sign_out':
-            return { ...state, token: null, errorMessage: '', userEmail: '', user: null, visitedUser: null };
-
-        case 'update_favorites':
-            return { ...state, user: { ...state.user, favorites: action.payload }, };
+            return {
+                ...state,
+                token: null,
+                errorMessage: '',
+                user: null,
+                visitedUser: null
+            };
 
         case 'update_user':
-            return { ...state, user: { ...state.user, ...action.payload }, };
+            return {
+                ...state,
+                user: {
+                    ...state.user,
+                    ...action.payload,  // Update user profile with new data
+                    favorites: action.payload.favorites || state.user.favorites || []
+                }
+            };
 
         default:
             return state;
     }
 };
 
-
-const loadTokenAndUser = (dispatch) => () => {
+const loadTokenAndUser = (dispatch) => async () => {
     const token = Cookies.get('authToken');
     const userEmail = Cookies.get('userEmail');
 
     if (token && userEmail) {
-        dispatch({ type: 'sign_in', payload: { token } });
-        dispatch({ type: 'add_email', payload: userEmail });
+        try {
+            const response = await axiosInstance.get(`/Account?email=${userEmail}`)
+            const userData = response.data.user;
+            // Now dispatch sign_in with token and complete user data
+            dispatch({ type: 'sign_in', payload: { token, userData } });
+        }
+        catch (error) {
+            console.error("Failed to fetch user:", error);
+            dispatch({ type: 'add_error', payload: 'Failed to fetch user data.' });
+        }
+    };
+}
 
-        // Fetch user data based on token/email
-        axiosInstance.get(`/Account?email=${userEmail}`)
-            .then(response => {
-                const user = response.data.user;
-                dispatch({ type: 'fetch_user', payload: user });
-            })
-            .catch(error => {
-                console.error("Failed to fetch user:", error);
-                dispatch({ type: 'add_error', payload: 'Failed to fetch user data.' });
-            });
+// Register a new user
+const register = (dispatch) => async ({ name, email, password, profileAvatar }) => {
+    dispatch({ type: 'clear_error' });
+    dispatch({ type: 'set_loading', payload: true });
+
+    try {
+        const body = { name, email, password, profileAvatar };
+        const response = await axiosInstance.post('/auth/Register', body);
+
+        const { token, profileAvatar, name, userId, favorites } = response.data;
+
+        // Store user data in cookies
+        Cookies.set('authToken', token, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
+        Cookies.set('userEmail', email, { expires: 7, path: '/', sameSite: 'Strict' });
+
+        // Dispatch register action with token and empty user data (favorites should be empty initially)
+        dispatch({
+            type: 'sign_in',
+            payload: {
+                token, userData: { userId, name, email, profileAvatar, favorites }
+            }
+        });
+    } catch (e) {
+        dispatch({ type: 'add_error', payload: 'Something went wrong during registration' });
+    } finally {
+        dispatch({ type: 'set_loading', payload: false });
     }
 };
 
+
+// Sign in the user
+const signIn = (dispatch) => async ({ email, password }) => {
+    dispatch({ type: 'set_loading', payload: true });
+
+    try {
+        const response = await axiosInstance.post('/auth/Login', { email, password });
+        const { token, profileAvatar, name, userId, favorites } = response.data;
+        if (!response.data.email) {
+            throw new Error('Email not returned from the server');
+        }
+        // Store user data in cookies
+        Cookies.set('authToken', token, { expires: 7, path: '/', sameSite: 'Strict' });
+        Cookies.set('userEmail', email, { expires: 7, path: '/', sameSite: 'Strict' });
+
+        // Dispatch sign_in action with token and userData (following the same structure as loadTokenAndUser)
+        dispatch({
+            type: 'sign_in',
+            payload: {
+                token, userData: { userId, name, email, profileAvatar, favorites }
+            }
+        });
+    } catch (e) {
+        dispatch({ type: 'add_error', payload: 'Invalid credentials' });
+    } finally {
+        dispatch({ type: 'set_loading', payload: false });
+    }
+};
+
+
+// Fetch other user's profile (for visiting user profiles)
 const fetchOtherUserProfile = (dispatch) => async (user) => {
     dispatch({ type: 'set_loading', payload: true });
     try {
@@ -78,21 +160,6 @@ const fetchOtherUserProfile = (dispatch) => async (user) => {
     }
 };
 
-// Update favorites in the user's profile
-const updateFavorites = (dispatch) => async (email, favorites) => {
-    dispatch({ type: 'set_loading', payload: true });
-    try {
-        const response = await axiosInstance.patch("/Account", { email, updates: { favorites } });
-        const updatedUser = response.data.user;
-        dispatch({ type: 'update_favorites', payload: updatedUser.favorites });
-    } catch (error) {
-        console.error("Error updating favorites:", error);
-        dispatch({ type: 'add_error', payload: "Failed to update favorites." });
-    } finally {
-        dispatch({ type: 'set_loading', payload: false });
-    }
-};
-
 // Update user information (like profile, email, etc.)
 const updateUser = (dispatch) => async ({ email, updates }) => {
     dispatch({ type: "set_loading", payload: true });
@@ -100,75 +167,14 @@ const updateUser = (dispatch) => async ({ email, updates }) => {
         const response = await axiosInstance.patch("/Account", { email, updates });
         const updatedUser = response.data.user;
 
-        // Update cookies if the profile avatar or name changes
-        if (updates.profileAvatar) {
-            Cookies.set('profileAvatar', updates.profileAvatar, { expires: 7, path: '/', sameSite: 'Strict' });
-        }
-        if (updates.name) {
-            Cookies.set('name', updates.name, { expires: 7, path: '/', sameSite: 'Strict' });
-        }
-
         // Dispatch actions to update user in the app state
         dispatch({ type: "update_user", payload: updatedUser });
     } catch (error) {
         console.error("Error updating user:", error);
-        const errorMessage =
-            error.response?.data?.message || "Failed to update user data. Please try again.";
+        const errorMessage = error.response?.data?.message || "Failed to update user data. Please try again.";
         dispatch({ type: "add_error", payload: errorMessage });
     } finally {
         dispatch({ type: "set_loading", payload: false });
-    }
-};
-
-// Register a new user
-const register = (dispatch) => async ({ name, email, password, profileAvatar }) => {
-    dispatch({ type: 'clear_error' });
-    dispatch({ type: 'set_loading', payload: true });
-    try {
-        const body = { name, email, password, profileAvatar };
-        const response = await axiosInstance.post('/auth/Register', body);
-        const { token, userId, user } = response.data;
-
-        // Store user data in cookies
-        Cookies.set('authToken', token, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
-        Cookies.set('userEmail', email, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
-        Cookies.set('userId', userId, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
-        Cookies.set('name', name, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
-        Cookies.set('profileAvatar', profileAvatar, { expires: 7, path: '/' });
-
-        dispatch({ type: 'register', payload: { token, user } });
-        dispatch({ type: 'add_email', payload: email });
-    } catch (e) {
-        dispatch({ type: 'add_error', payload: 'Something went wrong during registration' });
-    } finally {
-        dispatch({ type: 'set_loading', payload: false });
-    }
-};
-
-// Sign in the user
-const signIn = (dispatch) => async ({ email, password }) => {
-    dispatch({ type: 'set_loading', payload: true });
-    try {
-        const response = await axiosInstance.post('/auth/Login', { email, password });
-
-        const { token, profileAvatar, name, userId, favorites } = response.data;
-
-        if (!response.data.email) {
-            throw new Error('Email not returned from the server');
-        }
-
-        Cookies.set('authToken', token, { expires: 7, path: '/', sameSite: 'Strict' });
-        Cookies.set('userEmail', email, { expires: 7, path: '/', sameSite: 'Strict' });
-        if (userId) Cookies.set('userId', userId, { expires: 7, path: '/', sameSite: 'Strict' });
-        if (profileAvatar) Cookies.set('profileAvatar', profileAvatar, { expires: 7, path: '/', sameSite: 'Strict' });
-        if (name) Cookies.set('name', name, { expires: 7, path: '/', sameSite: 'Strict' });
-
-        dispatch({ type: 'sign_in', payload: { token, user: { name, profileAvatar, favorites } } });
-        dispatch({ type: 'add_email', payload: email });
-    } catch (e) {
-        dispatch({ type: 'add_error', payload: 'Invalid credentials' });
-    } finally {
-        dispatch({ type: 'set_loading', payload: false });
     }
 };
 
@@ -176,9 +182,6 @@ const signIn = (dispatch) => async ({ email, password }) => {
 const signOut = (dispatch) => () => {
     Cookies.remove('authToken');
     Cookies.remove('userEmail');
-    Cookies.remove('userId');
-    Cookies.remove('name');
-    Cookies.remove('profileAvatar');
     Cookies.remove('searchTerm');
     dispatch({ type: 'sign_out' });
 };
@@ -192,7 +195,7 @@ const clearError = (dispatch) => () => {
 export const { Provider, Context } = createDataContext(
     authReducer,
     {
-        fetchOtherUserProfile, register, signIn, signOut, clearError, loadTokenAndUser, updateUser, updateFavorites
+        fetchOtherUserProfile, register, signIn, signOut, clearError, loadTokenAndUser, updateUser
     },
-    { token: null, user: null, favorites: [], visitedUser: null, errorMessage: '', loading: false }
+    { token: null, user: null, visitedUser: null, errorMessage: '', loading: false }
 );

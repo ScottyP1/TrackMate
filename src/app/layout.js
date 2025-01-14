@@ -9,8 +9,6 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { Provider as AuthProvider } from '@/context/AuthContext';
 import { Provider as TrackProvider } from '@/context/TrackContext';
 
-import { dbConnect } from "@/lib/db";
-
 import "./globals.css";
 
 export const metadata = {
@@ -19,10 +17,9 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  dbConnect();
   return (
     <html lang="en">
-      <body>
+      <body className="bg-gradient-to-b from-black/[.7] via-blue-500 to-black">
         <AuthProvider>
           <TrackProvider>
             <AppRouterCacheProvider>

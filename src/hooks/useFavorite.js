@@ -5,7 +5,7 @@ import { Context as AuthContext } from '@/context/AuthContext';  // Ensure this 
 import Cookies from 'js-cookie';
 
 export const useFavorite = (trackId) => {
-    const { state, updateFavorites } = useContext(AuthContext);
+    const { state, updateUser } = useContext(AuthContext);
     const [isFavorite, setIsFavorite] = useState(false);
     const router = useRouter();
 
@@ -17,7 +17,7 @@ export const useFavorite = (trackId) => {
 
     const handleFavoriteClick = async () => {
         const token = Cookies.get('authToken');
-        const userEmail = Cookies.get('userEmail');
+        const email = Cookies.get('userEmail');
 
         if (!token) {
             router.push('/Login');  // Redirect to login if no token
@@ -29,9 +29,14 @@ export const useFavorite = (trackId) => {
                 ? state.user.favorites.filter(fav => fav !== trackId)
                 : [...state.user.favorites, trackId];
 
-            // Use the updateFavorites action to update the favorites
-            await updateFavorites(userEmail, newFavorites);  // Update favorites in the context
+            // Format updates as { favorites: [array of track IDs] }
+            const updates = { favorites: newFavorites };
+
+            // Call updateUser with the correctly formatted updates
+            await updateUser({ email, updates });  // Send the updates as an object with the favorites array
+
             setIsFavorite(!isFavorite);  // Toggle the favorite status
+
         } catch (error) {
             console.error('Failed to update favorites', error);
         }

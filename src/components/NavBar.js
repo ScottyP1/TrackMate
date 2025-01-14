@@ -15,30 +15,19 @@ import Avatar from '@mui/material/Avatar';
 import { Context as AuthContext } from '@/context/AuthContext';
 import Cookies from 'js-cookie';
 
-const pages = ['Home', 'Tracks', 'About', 'HowTo'];
+const pages = ['Home', 'Tracks', 'About', 'Contact'];
 
 function NavBar() {
     const [menuAnchor, setMenuAnchor] = React.useState(null);
     const [userMenuAnchor, setUserMenuAnchor] = React.useState(null);
-    const [userAvatar, setUserAvatar] = React.useState('/Avatars/default-avatar.png');  // Default avatar
     const { state, loadTokenAndUser, signOut } = React.useContext(AuthContext);
     const pathname = usePathname();
 
     React.useEffect(() => {
-        const avatarFromCookies = Cookies.get('profileAvatar'); // Read avatar from cookies
-
-        // Set avatar based on cookies or default
-        if (avatarFromCookies && state.user?.avatar !== avatarFromCookies) {
-            setUserAvatar(avatarFromCookies);  // Use avatar from cookies if different
-        } else {
-            setUserAvatar(state.user?.profileAvatar || avatarFromCookies || '/Avatars/default-avatar.png');  // Fallback to default
-        }
-
-        // If the user is not authenticated, try loading their token and user
         if (!state.token) {
             loadTokenAndUser();
-        }
-    })
+        }        // If the user is not authenticated, try loading their token and user
+    }, []);
 
     const handleMenuOpen = (event) => setMenuAnchor(event.currentTarget);
     const handleMenuClose = () => setMenuAnchor(null);
@@ -68,7 +57,7 @@ function NavBar() {
                         transformOrigin={{ vertical: 'top', horizontal: 'left' }}
                         PaperProps={{
                             style: {
-                                backgroundColor: '#000000', // Black background
+                                backgroundColor: '#1a1a1a', // Black background
                                 color: '#ffffff', // White text for contrast
                                 borderRadiusBottom: '8px', // Rounded corners
                                 marginTop: '4px', // Add spacing below the navbar
@@ -131,7 +120,7 @@ function NavBar() {
 
                 {/* User Menu */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <a href="https://www.buymeacoffee.com/TrackMate" className="hidden md:block">
+                    <a href="https://www.buymeacoffee.com/TrackMate" className="hidden md:block ">
                         <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a RedBull&emoji=🤟🏻&slug=TrackMate&button_colour=5F7FFF&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00" />
                     </a>
                     {!state.token ? (
@@ -141,7 +130,7 @@ function NavBar() {
                     ) : (
                         <>
                             <IconButton onClick={handleUserMenuOpen} color="inherit">
-                                <Avatar alt={state.user?.name || 'User'} src={userAvatar} />
+                                <Avatar alt={state.user?.name || 'User'} src={state.user?.profileAvatar} />
                             </IconButton>
                             <Menu
                                 anchorEl={userMenuAnchor}
@@ -151,10 +140,11 @@ function NavBar() {
                                 transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                                 PaperProps={{
                                     style: {
-                                        backgroundColor: '#000000', // Black background
+                                        backgroundColor: '#1a1a1a', // Black background
                                         color: '#ffffff', // White text for contrast
                                         borderRadiusBottom: '8px', // Rounded corners
                                         marginTop: '4px', // Add spacing below the navbar
+                                        width: '150px'
                                     },
                                 }}
                             >

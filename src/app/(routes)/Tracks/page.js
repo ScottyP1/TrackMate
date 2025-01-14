@@ -2,7 +2,6 @@
 import { useContext, useEffect } from 'react';
 
 import DOMPurify from 'dompurify';
-import Link from 'next/link';
 
 import { Context as TrackContext } from '@/context/TrackContext';
 import SearchBar from '@/components/SearchBar';

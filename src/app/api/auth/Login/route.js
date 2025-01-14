@@ -48,7 +48,8 @@ export async function POST(req) {
             userId: user._id,
             email: user.email,
             profileAvatar: user.profileAvatar,
-            name: user.name
+            name: user.name,
+            favorites: user.favorites || []  // Ensure favorites is returned (empty array if undefined)
         });
     } catch (err) {
         console.error('Error:', err);
