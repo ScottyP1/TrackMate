@@ -1,8 +1,6 @@
-'use client'
+'use client';
 import { useContext, useEffect } from 'react';
-
-import DOMPurify from 'dompurify';
-
+import DOMPurify from 'dompurify'; // Keep import for sanitizing searchTerm if needed
 import { Context as TrackContext } from '@/context/TrackContext';
 import SearchBar from '@/components/SearchBar';
 import { TrackCard } from '@/components/Track/TrackCard';
@@ -12,20 +10,15 @@ export default function Tracks() {
     const { state, fetchTracks, setZipCode, setRadius } = useContext(TrackContext);
 
     const handleSearch = async (searchTerm, radius) => {
-        // Sanitize inputs
         const sanitizedSearchTerm = DOMPurify.sanitize(searchTerm);
-        const sanitizedRadius = DOMPurify.sanitize(radius);
-
-        // Determine if searchTerm is a ZIP code or a track name
         const isZipCode = /^\d{5}$/.test(sanitizedSearchTerm);
 
         if (isZipCode) {
-            setZipCode(sanitizedSearchTerm);  // If it's a ZIP code, save the ZIP code
-            setRadius(sanitizedRadius); // Set the radius
-            fetchTracks(sanitizedSearchTerm, sanitizedRadius); // Fetch tracks for the ZIP code
+            setZipCode(sanitizedSearchTerm);
+            setRadius(radius);
+            fetchTracks(sanitizedSearchTerm, radius);
         } else {
-            // If it's a track name, just use that with the radius
-            fetchTracks(sanitizedSearchTerm, sanitizedRadius);
+            fetchTracks(sanitizedSearchTerm, radius);
         }
     };
 

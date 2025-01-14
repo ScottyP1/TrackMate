@@ -1,10 +1,11 @@
+'use client'
 import Header from '../components/Header';
-import Cookies from 'js-cookie';
-import { redirect } from 'next/navigation'
+import useFetchUserAccount from '@/hooks/useFetchUserAccount';
+
 
 
 export default function Home() {
-
+  useFetchUserAccount();
   return (
     <div className="relative w-full text-center bg-black">
       <div className="absolute top-0 homeBG bg-cover bg-center"></div>

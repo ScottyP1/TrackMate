@@ -50,7 +50,7 @@ const TrackDetailsPage = () => {
                         <img
                             src={track.logo}
                             alt="Track Logo"
-                            className="rounded-full max-w-[200px] max-h-[100px]"
+                            className="rounded-full max-w-[200px] max-h-[100px] md:max-w-[400px] mdmax-h-[100px]"
                         />
                     ) : (
                         <h1 className="text-5xl font-bold text-center">{track.name}</h1>

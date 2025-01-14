@@ -1,21 +1,115 @@
-import Link from "next/link";
-import { FaSearch, FaMapPin, FaRoute, FaTruckPickup } from 'react-icons/fa';
+'use client';
+
+import { useState } from 'react';
+import { FaPaperPlane } from 'react-icons/fa';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Contact() {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        message: '',
+    });
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        // Encode the form data
+        const subject = encodeURIComponent(`Contact from ${formData.name}`);
+        const body = encodeURIComponent(`
+            Name: ${formData.name}
+            Email: ${formData.email}
+            Message: ${formData.message}
+        `);
+
+        const mailtoLink = `mailto:codymoto122@gmail.com?subject=${subject}&body=${body}`;
+
+        // Open the mail client
+        window.location.href = mailtoLink;
+
+        // Optionally show a success message after opening the mail client
+        toast.success('Your message is ready to send!', {
+            position: "top-center",
+            autoClose: 1000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            theme: "dark",
+        });
+
+        // Reset form data
+        setFormData({ name: '', email: '', message: '' });
+    };
+
     return (
-        <div className="bg-gradient-to-br from-black to-blue-600 text-white py-20 px-4">
-            <div className="max-w-6xl mx-auto text-center">
-                {/* Introduction Section */}
-                <h2 className="text-4xl font-semibold mb-4 text-gradient bg-clip-text">Have a Private Track?</h2>
-                <p className="text-lg mb-8">Create an account or login to submit your track for others to find.</p>
-                <Link href="/Login">
-                    <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-full shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all">
-                        Get Started
+        <>
+            <ToastContainer />
+
+            <section className="mt-16 p-8 bg-gradient-to-b from-black/[.8] via-transparent to-transparent text-center">
+                <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 animate-fade-in">Contact Us</h1>
+                <p className="text-lg text-blue-200 mb-8 animate-fade-in-delay-1">
+                    We're here to help. Reach out with any questions or feedback!
+                </p>
+
+                <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 bg-black/[.7] rounded-lg shadow-lg">
+                    <div className="mb-4">
+                        <label htmlFor="name" className="block text-white text-lg mb-2">Name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className="w-full p-3 bg-gray-900 text-white rounded-md border-2 border-blue-500 focus:ring-2 focus:ring-blue-500"
+                            required
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="email" className="block text-white text-lg mb-2">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            className="w-full p-3 bg-gray-900 text-white rounded-md border-2 border-blue-500 focus:ring-2 focus:ring-blue-500"
+                            required
+                        />
+                    </div>
+
+                    <div className="mb-6">
+                        <label htmlFor="message" className="block text-white text-lg mb-2">Message</label>
+                        <textarea
+                            id="message"
+                            name="message"
+                            value={formData.message}
+                            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                            className="w-full p-3 bg-gray-900 text-white rounded-md border-2 border-blue-500 focus:ring-2 focus:ring-blue-500"
+                            rows="6"
+                            required
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="w-full py-3 bg-gradient-to-b from-blue-500 to-blue-900 text-white font-semibold rounded-full transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30 transition-all focus:ring-2 focus:ring-blue-500 flex items-center justify-center gap-2"
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <span>Sending...</span>
+                        ) : (
+                            <>
+                                <span>Send Message</span>
+                                <FaPaperPlane className="h-5 w-5 transform group-hover:translate-x-2 transition-all duration-300" />
+                            </>
+                        )}
                     </button>
-                </Link>
-            </div>
-
-
-        </div>
+                </form>
+            </section>
+        </>
     );
 }

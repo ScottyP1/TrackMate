@@ -13,16 +13,18 @@ import AvatarList from "@/components/AvatarList";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import useFetchUserAccount from "@/hooks/useFetchUserAccount";
+
 export default function Account() {
-    const { state: authState, updateUser, loadTokenAndUser } = useContext(AuthContext);
+    const { state: authState, updateUser } = useContext(AuthContext);
     const { state: trackState, fetchFavoriteTracks } = useContext(TrackContext);
     const [formData, setFormData] = useState({ name: '', email: '', profileAvatar: '' });
     const [menu, setMenu] = useState(false);
 
     // Fetch favorite tracks if the user has favorites
-    useEffect(() => {
-        loadTokenAndUser();
+    useFetchUserAccount();
 
+    useEffect(() => {
         const token = Cookies.get('authToken');
         if (!token) {
             redirect('/');
@@ -42,7 +44,7 @@ export default function Account() {
                 fetchFavoriteTracks(authState.user.favorites);
             }
         }
-    }, [authState]);  // Run the effect when authState changes
+    }, [authState.user]);  // Run the effect when authState changes
 
 
     const onSelect = (avatar) => {
@@ -85,7 +87,7 @@ export default function Account() {
                         {/* Avatar */}
                         <div className="relative flex flex-col items-center ">
                             <img
-                                src={authstate.profileAvatar || '/default-avatar.png'}
+                                src={authState.user.profileAvatar || '/default-avatar.png'}
                                 alt="User Avatar"
                                 className="w-[60px] h-[60px] md:w-20 md:h-20 rounded-full border-2 border-blue-500"
                             />

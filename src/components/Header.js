@@ -1,7 +1,6 @@
 import { MapIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import Image from "next/image";
-import AppStoreButton from "@/components/AppStoreButton";
+
 
 export default function Header() {
     return (
@@ -27,7 +26,7 @@ export default function Header() {
                 {/* Button Section */}
                 <div className="flex justify-center gap-6 mt-8 animate-fade-in-delay-3">
                     {/* Get Started Button */}
-                    <Link href="/HowTo">
+                    <Link href="/Register">
                         <button
                             aria-label="Get Started with Trackmate"
                             className="px-6 py-3 bg-gradient-to-b from-blue-500 to-blue-900 text-white font-semibold rounded-full transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30 transition-all focus:ring-2 focus:ring-blue-500 flex items-center justify-center gap-2"

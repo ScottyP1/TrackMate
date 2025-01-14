@@ -98,7 +98,7 @@ export default function CommentsSection({ trackId }) {
                 />
                 <button
                     onClick={handleCommentSubmit}
-                    className="self-end px-3 sm:px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 text-sm sm:text-base"
+                    className="self-end bg-gradient-to-r from-blue-600 to-indigo-700 text-white w-full md:w-[100px] h-[48px] rounded-lg p-3 hover:bg-blue-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-80"
                 >
                     Submit
                 </button>

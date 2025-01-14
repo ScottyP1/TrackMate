@@ -13,20 +13,17 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Image from 'next/image';
 import Avatar from '@mui/material/Avatar';
 import { Context as AuthContext } from '@/context/AuthContext';
+import useFetchUserAccount from '@/hooks/useFetchUserAccount';
 
 const pages = ['Home', 'Tracks', 'About', 'Contact'];
 
 function NavBar() {
     const [menuAnchor, setMenuAnchor] = React.useState(null);
     const [userMenuAnchor, setUserMenuAnchor] = React.useState(null);
-    const { state, loadTokenAndUser, signOut } = React.useContext(AuthContext);
+    const { state, signOut } = React.useContext(AuthContext);
     const pathname = usePathname();
 
-    React.useEffect(() => {
-        if (!state.token) {
-            loadTokenAndUser();
-        }        // If the user is not authenticated, try loading their token and user
-    }, []);
+    useFetchUserAccount();
 
     const handleMenuOpen = (event) => setMenuAnchor(event.currentTarget);
     const handleMenuClose = () => setMenuAnchor(null);
@@ -147,24 +144,21 @@ function NavBar() {
                                     },
                                 }}
                             >
-                                <MenuItem onClick={() => handleUserMenuClose()}>
-                                    <Link href="/Account">
+                                <Link href="/Account">
+                                    <MenuItem onClick={() => handleUserMenuClose()}>
                                         Account
-                                    </Link>
-                                </MenuItem>
-
-                                <MenuItem onClick={() => handleUserMenuClose()}>
-                                    <Link href="/PrivateTrack">
+                                    </MenuItem>
+                                </Link>
+                                <Link href="/PrivateTrack">
+                                    <MenuItem onClick={() => handleUserMenuClose()}>
                                         Private Track
-                                    </Link>
-                                </MenuItem>
-
-                                <MenuItem onClick={() => handleUserMenuClose()}>
-                                    <Link href="/Inbox">
+                                    </MenuItem>
+                                </Link>
+                                <Link href="/Inbox">
+                                    <MenuItem onClick={() => handleUserMenuClose()}>
                                         Inbox
-                                    </Link>
-                                </MenuItem>
-
+                                    </MenuItem>
+                                </Link>
                                 <MenuItem onClick={handleSignOut}>Log out</MenuItem>
                             </Menu>
                         </>
