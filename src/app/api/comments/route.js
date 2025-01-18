@@ -31,102 +31,90 @@ export async function GET(req) {
 }
 
 
-export async function PUT(req) {
-    const { commentId, userEmail, action, text, replyUserName } = await req.json();
-
-    if (!commentId || !userEmail || !action) {
-        return new Response("Missing required fields", { status: 400 });
+export async function PATCH(req) {
+    const { commentId, userId, action, text, replyUserName } = await req.json();
+    if (!commentId || !userId || !action) {
+        return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
     }
 
     try {
         await dbConnect();
 
-        // Find the user by email
-        const user = await User.findOne({ email: userEmail });
+        // Find the user by userId instead of email
+        const user = await User.findById(userId);  // Find by userId here
         if (!user) {
-            return new Response("User not found", { status: 404 });
+            return NextResponse.json({ message: "User not found" }, { status: 404 });
         }
 
-        // Find the parent comment by ID
-        const parentComment = await Comment.findById(commentId);
-        if (!parentComment) {
-            return new Response("Parent comment not found", { status: 404 });
+        // Find the comment by ID
+        const comment = await Comment.findById(commentId);
+        if (!comment) {
+            return NextResponse.json({ message: "Comment not found" }, { status: 404 });
         }
 
-        // Handle likes/unlikes
-        const hasLiked = parentComment.likes.includes(user._id);
+        // Handle the 'like' or 'unlike' action
+        if (action === "like" || action === "unlike") {
+            const hasLiked = comment.likes.includes(user._id);
 
-        if (action === "like") {
-            if (!hasLiked) {
-                parentComment.likes.push(user._id); // Add user ID to likes array
+            if (action === "like" && !hasLiked) {
+                // Add user ID to likes array
+                comment.likes.push(user._id);
+            } else if (action === "unlike" && hasLiked) {
+                // Remove user ID from likes array
+                comment.likes = comment.likes.filter(like => !like.equals(user._id));
             }
-        } else if (action === "unlike") {
-            if (hasLiked) {
-                parentComment.likes = parentComment.likes.filter(
-                    (id) => !id.equals(user._id) // Remove user ID from likes array
-                );
-            }
-        } else if (action === "reply") {
+        }
+
+        // Handle the 'reply' action
+        if (action === "reply") {
             if (!text) {
-                return new Response("Missing reply text", { status: 400 });
+                return NextResponse.json({ message: "Missing reply text" }, { status: 400 });
             }
 
-            // Create a new reply object
+            // Add the reply to the replies array
             const reply = {
                 text,
                 userId: user._id,
                 userName: replyUserName || "Anonymous",  // Default to "Anonymous" if no userName
             };
-
-            // Add the reply to the parent comment
-            parentComment.replies.push(reply);
-
-            // Save the updated comment with the reply
-            await parentComment.save();
-
-            // Populate the userId of the reply with the user details (name and profileAvatar)
-            const populatedReply = await parentComment.populate({
-                path: 'replies.userId',
-                select: 'name profileAvatar' // Populate both name and profileAvatar
-            });
-
-            // Return the new reply with populated user data (name and profileAvatar)
-            const newReply = populatedReply.replies.pop(); // Get the last reply that was added
-            return new Response(
-                JSON.stringify({ reply: newReply }),
-                { status: 200, headers: { "Content-Type": "application/json" } }
-            );
-        } else {
-            return new Response("Invalid action", { status: 400 });
+            comment.replies.push(reply);
         }
 
-        // Save the updated comment for likes/unlikes
-        await parentComment.save();
+        // Save the updated comment document
+        await comment.save();
 
-        return new Response(
-            JSON.stringify({ likes: parentComment.likes }),
-            { status: 200, headers: { "Content-Type": "application/json" } }
-        );
+        // Return the updated comment with populated user data for replies
+        const populatedComment = await comment.populate({
+            path: 'replies.userId',
+            select: 'name profileAvatar'
+
+        });
+
+        // Return the updated comment data (likes and replies)
+        return NextResponse.json({ likes: populatedComment.likes, replies: populatedComment.replies }, {
+            status: 200,
+        });
     } catch (error) {
         console.error("Error updating comment:", error);
-        return new Response("Failed to update comment", { status: 500 });
+        return NextResponse.json({ message: "Failed to update comment" }, { status: 500 });
     }
 }
 
 
 
 
+
 export async function POST(req) {
     try {
-        const { text, trackId, userEmail } = await req.json();
+        const { text, trackId, userId } = await req.json();
 
-        if (!text || !trackId || !userEmail) {
+        if (!text || !trackId || !userId) {
             return new Response("Missing required fields", { status: 400 });
         }
 
         await dbConnect();
 
-        const user = await User.findOne({ email: userEmail });
+        const user = await User.findById(userId);
         if (!user) {
             return new Response("User not found", { status: 404 });
         }

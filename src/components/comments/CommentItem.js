@@ -1,129 +1,124 @@
-import { useState, useEffect } from "react";
-import { FaUser, FaTrash } from "react-icons/fa";
-import ReplyForm from "./ReplyForm";
-import axios from "axios";
-import Cookies from "js-cookie";
-import Link from "next/link"; // Import the Link component
+import { FaTrash } from 'react-icons/fa';
+import { useContext, useState } from 'react';
+import { Context as CommentContext } from '@/context/CommentContext';
+import { Context as AuthContext } from '@/context/AuthContext';
+import Cookies from 'js-cookie';
+import Link from 'next/link';
 
-export default function CommentItem({ comment, userName, onCommentDelete }) {
-    const [userHasLiked, setUserHasLiked] = useState(false);
-    const [likes, setLikes] = useState(comment.likes || []);
-    const [isDeleted, setIsDeleted] = useState(false);  // Track if the comment is deleted
+export default function CommentItem({ comment }) {
+    const { likeComment, deleteComment } = useContext(CommentContext);  // Add deleteComment
+    const { state } = useContext(AuthContext);
 
-    const userId = Cookies.get("userId"); // Get the logged-in user's userId
+    const token = Cookies.get('authToken');
 
-    useEffect(() => {
-        if (userId) {
-            const likesArray = comment.likes || [];
-            setUserHasLiked(likesArray.some((like) => like.userId === userId));
-        }
-    }, [comment._id, userId]);
+    const [showReplyForm, setShowReplyForm] = useState(false);
+    const [showReplies, setShowReplies] = useState(false);
 
-    // Handle like/unlike logic
     const handleLike = async () => {
-        if (!userId) {
-            alert("Please log in to like comments.");
+        if (!token) {
+            alert('Please log in to like comments.');
             return;
         }
-
-        const action = userHasLiked ? "unlike" : "like";
-
-        try {
-            await axios.put("/api/comments", { commentId: comment._id, userId, action });
-
-            setLikes((prevLikes) =>
-                action === "like"
-                    ? [...prevLikes, { userId }]
-                    : prevLikes.filter((like) => like.userId !== userId)
-            );
-
-            setUserHasLiked(!userHasLiked);
-        } catch (error) {
-            console.error("Error liking/unliking comment:", error);
-        }
+        await likeComment(comment._id, state.user.id);
     };
 
-    // Handle deleting the comment
-    const handleDelete = async () => {
-        if (window.confirm("Are you sure you want to delete this comment?")) {
-            try {
-                const response = await axios.delete(`/api/comments?commentId=${comment._id}`);
-
-                if (response.status === 200) {
-                    setIsDeleted(true); // Mark the comment as deleted
-                    if (onCommentDelete) {
-                        onCommentDelete(comment._id); // Notify the parent component to remove the comment
-                    }
-                }
-            } catch (error) {
-                console.error("Error deleting comment:", error);
-            }
-        }
+    const handleReplyClick = () => {
+        setShowReplyForm((prev) => !prev); // Toggle the reply form visibility
     };
 
-    if (isDeleted) {
-        return (
-            <div className="bg-gray-700 p-3 sm:p-4 rounded-md shadow space-y-3">
-                <p className="text-gray-300 text-sm sm:text-base">Comment deleted</p>
-            </div>
-        );
-    }
+    const handleCommentsClick = () => {
+        setShowReplies((prev) => !prev); // Toggle the visibility of the replies
+    };
 
-    // Check if the current user owns the comment (userId should match the userId in cookies)
-    const canDelete = comment.userId._id === userId;
+    const handleDeleteClick = async () => {
+        if (window.confirm('Are you sure you want to delete this comment?')) {
+            await deleteComment(comment._id);  // Call the delete action
+        }
+    };
 
     return (
-        <div className="bg-gray-700 p-3 sm:p-4 rounded-md shadow space-y-3 relative">
-            {/* Delete Button - only visible if the user is the comment owner */}
-            {canDelete && (
-                <button
-                    onClick={handleDelete}
-                    className="absolute top-2 right-2 p-2 rounded-full text-gray-400 hover:text-white hover:bg-red-600 transition-colors duration-200 ease-in-out transform hover:scale-105 focus:outline-none"
-                    title="Delete Comment"
-                    style={{ zIndex: 10 }} // Ensuring it's on top of other content
-                >
-                    <FaTrash className="text-lg sm:text-xl" />
-                </button>
-            )}
-
-            {/* User Info */}
-            <div className="flex items-center space-x-3">
-                {comment.userId?.profileAvatar ? (
+        <div className="p-6 bg-black/[.6] shadow-lg rounded-xl mb-6">
+            <div className="flex justify-between items-center mb-4">
+                {/* User Info */}
+                <div className="flex items-center space-x-4">
                     <Link href={`/Account/${comment.userId._id}`}> {/* Add Link to user's profile */}
                         <img
-                            src={comment.userId.profileAvatar} // Ensure this is populated
+                            src={comment.userId.profileAvatar || '/default-avatar.png'}
                             alt="User Avatar"
-                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover cursor-pointer"
+                            className="w-[60px] h-[60px] md:w-20 md:h-20 rounded-full border-2 border-blue-500"
                         />
                     </Link>
-                ) : (
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-600 rounded-full flex items-center justify-center">
-                        <FaUser className="text-gray-400 text-sm sm:text-lg" />
-                    </div>
+                    <span className="text-white text-xl font-semibold">
+                        {comment.userId?.name || 'Anonymous'}
+                    </span>
+                </div>
+
+                {/* Trash Icon (Optional, show if user is the comment author) */}
+                {state.user.id === comment.userId?._id && (
+                    <button
+                        className="text-red-500 hover:text-red-700 transition-all duration-300"
+                        onClick={handleDeleteClick} // Call delete function on click
+                    >
+                        <FaTrash className="h-5 w-5" />
+                    </button>
                 )}
-                <span className="font-semibold text-gray-200 text-sm sm:text-base">
-                    {comment.userId?.name || "Anonymous"} {/* Display name or fallback */}
-                </span>
             </div>
 
             {/* Comment Text */}
-            <p className="text-gray-300 text-sm sm:text-base break-words">{comment.text}</p>
+            <p className="text-white text-lg mb-4">{comment.text}</p>
 
-            {/* Like and Reply Actions */}
-            <div className="flex items-center justify-between text-xs sm:text-sm text-gray-400 flex-wrap">
+            {/* Like and Reply Section */}
+            <div className="flex justify-between items-center text-blue-500 space-x-4">
+                {/* Like Button */}
                 <button
                     onClick={handleLike}
-                    className={`font-medium ${userHasLiked ? "text-red-500" : "text-blue-400"} hover:underline`}
+                    className="flex items-center space-x-2 hover:underline focus:outline-none transition-all duration-300"
                 >
-                    {userHasLiked ? "Unlike" : "Like"} {likes.length}
+                    <span>{comment.likes.length} Likes</span>
                 </button>
 
-                <ReplyForm
-                    commentId={comment._id}
-                    replies={comment.replies || []}
-                    userName={userName}
-                />
+                {/* Comments Button */}
+                <button
+                    onClick={handleCommentsClick}
+                    className="flex items-center space-x-2 hover:underline focus:outline-none transition-all duration-300"
+                >
+                    <span>{comment.replies.length} Comments</span>
+                </button>
+
+                {/* Reply Button */}
+                <button
+                    onClick={handleReplyClick}
+                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-300"
+                >
+                    {showReplyForm ? 'Cancel Reply' : 'Reply'}
+                </button>
             </div>
+
+            {/* Show the Replies Section */}
+            {showReplies && comment.replies.length > 0 && (
+                <div className="mt-4 space-y-4">
+                    {comment.replies.map((reply, index) => (
+                        <div className="flex items-center space-x-4" key={index}>
+                            <div>
+                                <img
+                                    src={reply.userId.profileAvatar || '/default-avatar.png'}
+                                    alt="User Avatar"
+                                    className="w-[60px] h-[60px] md:w-20 md:h-20 rounded-full border-2 border-blue-500"
+                                />
+                                <span className="text-white text-xl font-semibold">
+                                    {reply.userId?.name || 'Anonymous'}
+                                </span>
+                            </div>
+                            <div>
+                                <span>{reply.text}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Show the Reply Form if toggled */}
+            {showReplyForm && <ReplyForm commentId={comment._id} />}
         </div>
     );
 }

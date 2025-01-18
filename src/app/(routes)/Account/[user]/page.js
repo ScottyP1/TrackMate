@@ -1,10 +1,11 @@
 'use client';
+
 import { useState, useEffect, useContext } from "react";
 import { usePathname, useRouter } from 'next/navigation';
-import Cookies from "js-cookie";
 
 import { Context as AuthContext } from "@/context/AuthContext";
 import { Context as TrackContext } from "@/context/TrackContext";
+import { Context as InboxContext } from "@/context/InboxContext";  // Import InboxContext
 
 import { TrackCard } from "@/components/Track/TrackCard";
 import PageSpinner from "@/components/spinners/PageSpinner";
@@ -12,40 +13,62 @@ import PageSpinner from "@/components/spinners/PageSpinner";
 export default function UserProfile() {
     const { state: authState, fetchOtherUserProfile } = useContext(AuthContext);
     const { state: trackState, fetchFavoriteTracks } = useContext(TrackContext);
+    const { sendMessage } = useContext(InboxContext);  // Access sendMessage from InboxContext
+
     const [user, setUser] = useState(null);  // State to hold the visited user
+    const [messageText, setMessageText] = useState("");  // State to hold the composed message
+    const [isMessageFormVisible, setIsMessageFormVisible] = useState(false);  // Toggle to show message form
+    const [isSending, setIsSending] = useState(false);  // State for handling message sending status
     const router = useRouter();
 
     const pathname = usePathname();
-    const userIdFromUrl = pathname.split('/').pop();
-    const loggedInUserId = Cookies.get('userId');
+    const userIdFromUrl = pathname.split('/').pop(); // Extract user ID from the URL path
+    const loggedInUserId = authState.user?.id;
 
-    // This useEffect handles user profile fetch and redirect logic
+    // Fetch user profile and handle redirect logic
     useEffect(() => {
-        // Prevent redirect and fetch if we're visiting our own profile
+        // Prevent user from messaging themselves
         if (userIdFromUrl === loggedInUserId) {
             router.push('/Account');
             return;
         }
 
-        // Fetch user profile only once
+        // Fetch other user's profile (for the visited user)
         fetchOtherUserProfile(userIdFromUrl)
             .catch((error) => {
                 console.error("Error fetching user profile:", error);
             });
-    }, []);
+    }, [userIdFromUrl]);
 
-    // This useEffect will update the user data only if the visitedUser data changes
+    // Update visited user data and fetch their favorite tracks
     useEffect(() => {
         const visitedUser = authState.visitedUser;
         if (visitedUser) {
-            setUser(visitedUser);
+            setUser(visitedUser); // Update user data with the visited user
         }
 
         // Fetch the visited user's favorite tracks if any
         if (visitedUser?.favorites?.length) {
-            fetchFavoriteTracks(visitedUser.favorites, true);  // Pass `true` to indicate it's the visited user's favorites
+            fetchFavoriteTracks(visitedUser.favorites, true);  // Fetch their favorites
         }
     }, [authState.visitedUser]);
+
+    // Handle sending a message
+    const handleSendMessage = async () => {
+        if (!messageText.trim()) return; // Don't send empty messages
+
+        setIsSending(true);
+        try {
+            // Send message using sendMessage from InboxContext
+            await sendMessage(authState.user.email, user.email, messageText);
+            setMessageText('');  // Clear the input after sending the message
+            router.push('/Inbox');  // Optionally redirect to inbox after sending the message
+        } catch (error) {
+            console.error('Error sending message:', error);
+        } finally {
+            setIsSending(false);
+        }
+    };
 
     return (
         <div className="mt-24 p-4">
@@ -60,12 +83,21 @@ export default function UserProfile() {
                                 alt="User Avatar"
                                 className="w-[60px] h-[60px] md:w-20 md:h-20 rounded-full border-2 border-blue-500"
                             />
+                            {/* Message Block */}
+                            <div className="mt-4 text-white text-sm md:text-base text-center">
+                                <button
+                                    className="bg-gradient-to-r from-blue-600 to-indigo-700 p-2 rounded-lg"
+                                    onClick={() => setIsMessageFormVisible(true)}  // Toggle form visibility
+                                >
+                                    Message
+                                </button>
+                            </div>
                         </div>
 
                         {/* User Info */}
                         <div className="flex flex-col items-center ">
                             <h2 className="text-white text-md md:text-2xl font-semibold">{user.name}</h2>
-                            <p className="text-gray-400 text-sm md:text-xl email-truncate">{user.email}</p>
+                            {/* <p className="text-gray-400 text-sm md:text-xl email-truncate">{user.email}</p> */}
                         </div>
 
                         {/* Fav Tracks */}
@@ -76,13 +108,34 @@ export default function UserProfile() {
 
                         {/* Posted Tracks */}
                         <div className="flex flex-col items-center ">
-                            <h2 className="text-white text-md md:text-2xl font-semibold">Posted</h2>
+                            <h2 className="text-white text-md md:text-2xl font-semibold">Owned</h2>
                             <p className="text-gray-400 text-sm md:text-xl">0</p>
                         </div>
                     </div>
                 </div>
             ) : (
                 <PageSpinner />
+            )}
+
+            {/* Message Form (Visible when the 'Message' button is clicked) */}
+            {isMessageFormVisible && user && (
+                <div className="mt-4 w-full">
+                    <h2 className="text-white text-lg">Compose message to {user.email}</h2>
+                    <textarea
+                        className="w-full p-2 border border-gray-300 rounded-lg"
+                        placeholder="Type your message..."
+                        value={messageText}
+                        onChange={(e) => setMessageText(e.target.value)}
+                        rows="4"
+                    />
+                    <button
+                        className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500"
+                        onClick={handleSendMessage}
+                        disabled={isSending}
+                    >
+                        {isSending ? 'Sending...' : 'Send Message'}
+                    </button>
+                </div>
             )}
 
             {/* Favorite Tracks Section */}

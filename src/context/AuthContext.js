@@ -19,6 +19,7 @@ const authReducer = (state, action) => {
                 ...state,
                 user: {
                     ...action.payload.user,  // Merge any existing user data
+                    id: action.payload._id,
                     name: action.payload.name,
                     email: action.payload.email,
                     profileAvatar: action.payload.profileAvatar,
@@ -37,6 +38,7 @@ const authReducer = (state, action) => {
                 errorMessage: '',
                 user: {
                     ...action.payload.user,  // Merge any existing user data
+                    id: action.payload.userData._id,
                     name: action.payload.userData.name,
                     email: action.payload.userData.email,
                     profileAvatar: action.payload.userData.profileAvatar,
@@ -87,7 +89,7 @@ const loadTokenAndUser = (dispatch) => async () => {
 }
 
 // Register a new user
-const register = (dispatch) => async ({ name, email, password, profileAvatar }) => {
+const register = (dispatch) => async ({ email, password }) => {
     dispatch({ type: 'clear_error' });
     dispatch({ type: 'set_loading', payload: true });
 
@@ -129,7 +131,6 @@ const signIn = (dispatch) => async ({ email, password }) => {
         // Store user data in cookies
         Cookies.set('authToken', token, { expires: 7, path: '/', sameSite: 'Strict' });
         Cookies.set('userEmail', email, { expires: 7, path: '/', sameSite: 'Strict' });
-
         // Dispatch sign_in action with token and userData (following the same structure as loadTokenAndUser)
         dispatch({
             type: 'sign_in',
@@ -182,6 +183,7 @@ const updateUser = (dispatch) => async ({ email, updates }) => {
 const signOut = (dispatch) => () => {
     Cookies.remove('authToken');
     Cookies.remove('userEmail');
+    Cookies.remove('profileAvatar');
     Cookies.remove('searchTerm');
     dispatch({ type: 'sign_out' });
 };

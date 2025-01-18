@@ -29,7 +29,7 @@ export default function Header() {
                     <Link href="/Register">
                         <button
                             aria-label="Get Started with Trackmate"
-                            className="px-6 py-3 bg-gradient-to-b from-blue-500 to-blue-900 text-white font-semibold rounded-full transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30 transition-all focus:ring-2 focus:ring-blue-500 flex items-center justify-center gap-2"
+                            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold rounded-full transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30 transition-all focus:ring-2 focus:ring-blue-500 flex items-center justify-center gap-2"
                         >
                             <span>Get Started</span>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transform group-hover:translate-x-2 transition-all duration-300" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

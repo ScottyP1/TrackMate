@@ -35,7 +35,7 @@ export async function POST(req) {
             email: sanitizedEmail,
             password: password, // Save the hashed password
             profileAvatar,
-            favorites: []  // Initialize an empty array for favorites
+            favorites: []
         });
 
         await user.save();
@@ -43,15 +43,8 @@ export async function POST(req) {
         // Generate JWT token after the user is created
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        // Return success response with token, user info, and favorites
-        return NextResponse.json({
-            token,
-            userId: user._id,
-            email: user.email,
-            profileAvatar: user.profileAvatar,
-            name: user.name,
-            favorites: user.favorites || []  // Ensure favorites are returned
-        });
+        // Return success response with token and user info
+        return NextResponse.json({ token, userId: user._id });
     } catch (err) {
         console.error('Error during registration:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });

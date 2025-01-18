@@ -16,7 +16,6 @@ export async function GET(req) {
 
         // Fetch the user by email
         const user = await User.findOne({ email }).exec();
-
         if (!user) {
             return new Response("User not found", { status: 404 });
         }

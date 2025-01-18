@@ -7,7 +7,6 @@ import { useFavorite } from '@/hooks/useFavorite';
 import CommentsSection from '@/components/comments/CommentsSection';
 import ImageCarosel from '@/components/ImageCarosel';
 import NotFound from '@/app/not-found';
-import Spinner from '@/components/spinners/PageSpinner';
 
 const TrackDetailsPage = () => {
     const { state, fetchTrackById, clearError } = useContext(TrackContext);
@@ -29,11 +28,6 @@ const TrackDetailsPage = () => {
 
     const track = state.track;
     const { isFavorite, handleFavoriteClick } = useFavorite(placeId);
-
-    // If data is still loading, show the Spinner component
-    if (state.loading) {
-        return <Spinner />;
-    }
 
     // If no track found, render NotFound component
     if (!track) {

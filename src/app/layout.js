@@ -8,6 +8,8 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 
 import { Provider as AuthProvider } from '@/context/AuthContext';
 import { Provider as TrackProvider } from '@/context/TrackContext';
+import { Provider as CommentProvider } from '@/context/CommentContext'; // Ensure you're using the correct path
+import { Provider as InboxProvider } from '@/context/InboxContext';
 
 import "./globals.css";
 
@@ -22,15 +24,19 @@ export default function RootLayout({ children }) {
       <body className="bg-gradient-to-b from-black/[.7] via-blue-500 to-black">
         <AuthProvider>
           <TrackProvider>
-            <AppRouterCacheProvider>
-              <div className="text-white flex flex-col min-h-screen">
-                <NavBar />
-                <main className="flex-grow">{children}</main>
-                <Analytics />
-                <SpeedInsights />
-                <Footer />
-              </div>
-            </AppRouterCacheProvider>
+            <CommentProvider>
+              <InboxProvider>
+                <AppRouterCacheProvider>
+                  <div className="text-white flex flex-col min-h-screen">
+                    <NavBar />
+                    <main className="flex-grow">{children}</main>
+                    <Analytics />
+                    <SpeedInsights />
+                    <Footer />
+                  </div>
+                </AppRouterCacheProvider>
+              </InboxProvider>
+            </CommentProvider>
           </TrackProvider>
         </AuthProvider>
       </body>

@@ -159,7 +159,8 @@ html {
   /* Adjust height to go beyond container */
   transform: translateY(-20%) skew(10deg);
   /* Slant the rectangle */
-  background-color: #3b82f6;
+  background: linear-gradient(to right, #2563eb, #4f46e5);
+  /* Blue to Indigo gradient */
   /* Blue background */
   z-index: -1;
   /* Push it behind the text */

@@ -29,7 +29,7 @@ export default function Account() {
         if (!token) {
             redirect('/');
         }
-    }, []);
+    }, [authState.token]);
 
     useEffect(() => {
         if (authState?.user) {
@@ -115,7 +115,7 @@ export default function Account() {
 
                         {/* Posted Tracks */}
                         <div className="flex flex-col items-center ">
-                            <h2 className="text-white text-md md:text-2xl font-semibold">Posted</h2>
+                            <h2 className="text-white text-md md:text-2xl font-semibold">Owned</h2>
                             <p className="text-gray-400 text-sm md:text-xl">0</p>
                         </div>
                     </div>

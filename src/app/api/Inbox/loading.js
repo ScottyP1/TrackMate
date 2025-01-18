@@ -1,11 +1,11 @@
 // app/trackDetails/loading.js
 import React from 'react';
-import PageSpinner from '@/components/spinners/PageSpinner';
+import TracksSpinner from '@/components/spinners/PageSpinner';
 
 const Loading = () => {
     return (
         <div className="min-h-screen flex justify-center items-center text-white">
-            <PageSpinner />  {/* Custom Spinner Component */}
+            <TracksSpinner />  {/* Custom Spinner Component */}
         </div>
     );
 };

@@ -121,7 +121,7 @@ function NavBar() {
                     </a>
                     {!state.token ? (
                         <Link href="/Login" passHref>
-                            <button className="text-white w-[65px] bg-blue-500 hover:bg-blue-600 p-3 font-bold rounded-lg">Login</button>
+                            <button className="text-white w-[65px] bg-gradient-to-r from-blue-600 to-indigo-700  p-3 font-bold rounded-lg">Login</button>
                         </Link>
                     ) : (
                         <>
