@@ -33,8 +33,7 @@ export default function About() {
                     <div className="flex flex-col items-start gap-6">
                         <h2 className="text-3xl font-semibold text-white mb-6">How We Help</h2>
                         <p className="text-lg text-gray-300">
-                            Not only can you discover tracks, but you can also connect with others by reading and leaving comments on track pages. Share your experience, tips, and thoughts with the community. You can even submit your own private track for others to find, helping expand our community and making it even more inclusive.
-                        </p>
+                            As a member, you can explore a wide variety of tracks and share your experiences by leaving comments on track pages, helping others discover the best spots and prepare for their rides. Connect with fellow riders by adding them as friends and sending messages to stay in touch. Whether you’re swapping tips, sharing updates, or planning your next ride day together, our platform makes it easy to build a vibrant riding community.                        </p>
                     </div>
                 </div>
 

@@ -6,13 +6,12 @@ export default function Header() {
     return (
         <>
             {/* Header Section */}
-            <header className="relative text-center pt-24 bg-gradient-to-b from-black via-transparent to-transparent">
+            <header className="relative text-center pt-24">
                 <h1 className="flex justify-center items-center tracking-[12px] md:tracking-[px] font-bold text-white text-4xl sm:text-5xl md:text-6xl lg:text-8xl animate-fade-in relative inline-block animate-fade-in-delay-1">
                     <span className="ml-4">TRACK</span>
                     <span className="text-blue-500 shadow-glow ml-2">MATE</span>
                     <span className="text-[20px] md:text-[30px] text-blue-500 ml-1">MX</span>
 
-                    {/* Corner Borders */}
                     <span className="absolute top-[-10px] left-[-10px] md:left-[300px] w-4 h-4 border-t-4 border-l-4 border-white"></span>
                     <span className="absolute top-[-10px] right-[-10px] md:right-[300px] w-4 h-4 border-t-4 border-r-4 border-white"></span>
                     <span className="absolute bottom-[-10px] left-[-10px] md:left-[300px] w-4 h-4 border-b-4 border-l-4 border-white"></span>

@@ -29,7 +29,7 @@ export default function Tracks() {
         }
 
         if (state.tracks.length === 0) {
-            return <p className="text-center text-lg col-span-full">Enter your ZIP code or track name to get started.</p>;
+            return <p className="text-center text-lg col-span-full mt-12">Enter your ZIP code or track name to get started.</p>;
         }
 
         // Render the TrackCard component for each track
@@ -43,6 +43,7 @@ export default function Tracks() {
             <div className="w-full min-w-xl mx-auto mb-4">
                 <SearchBar onSearch={handleSearch} />
             </div>
+            <h1 className='text-center text-sm'>If you're a track owner please email us and claim your track</h1>
             {state.errorMessage && (
                 <p className="text-center text-lg text-red-500 mt-4">{state.errorMessage}</p>
             )}

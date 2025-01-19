@@ -38,7 +38,7 @@ function NavBar() {
         handleUserMenuClose();  // Close user menu
     };
     return (
-        <AppBar position="fixed" sx={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', zIndex: 10 }}>
+        <AppBar position="fixed" sx={{ backgroundColor: 'rgba(0, 0, 0, 0.70)', zIndex: 10 }}>
             <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 65, px: 2 }}>
                 {/* Mobile Menu */}
                 <Box sx={{ display: { xs: 'flex', md: 'none' }, justifyContent: 'start', alignItems: 'center' }}>
@@ -67,6 +67,11 @@ function NavBar() {
                                 </MenuItem>
                             </Link>
                         ))}
+                        <Link href={getPagePath('TrackMateApp')} passHref>
+                            <MenuItem onClick={handleMenuClose} className={isActivePage('TrackMateApp') ? 'current-page' : ''}>
+                                Join Community
+                            </MenuItem>
+                        </Link>
                         <MenuItem onClick={handleMenuClose} className="flex items-center justify-center">
                             <a
                                 href="https://www.buymeacoffee.com/TrackMate"
@@ -89,14 +94,14 @@ function NavBar() {
                 {/* Centered Logo */}
                 <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' }, justifyContent: 'center' }}>
                     <Link href="/" passHref>
-                        <Image src={'/images/logo.png'} width={70} height={45} alt="Logo" className='w-auto h-auto' />
+                        <Image src={'/images/logo2.png'} width={160} height={100} alt="Logo" />
                     </Link>
                 </Box>
 
                 {/* Desktop Navigation */}
-                <Box sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'start', alignItems: 'center', gap: 3 }}>
+                <Box sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'start', alignItems: 'center', gap: 4 }}>
                     <Link href="/" passHref>
-                        <Image src={'/images/logo.png'} width={120} height={45} alt="Logo" />
+                        <Image src={'/images/logo2.png'} width={150} height={45} alt="Logo" />
                     </Link>
                     {pages.map((page) => {
                         const isCurrentPage =
@@ -112,6 +117,11 @@ function NavBar() {
                             </MenuItem>
                         );
                     })}
+                    <Link href={getPagePath('TrackMateApp')} passHref>
+                        <MenuItem onClick={handleMenuClose} className={isActivePage('TrackMateApp') ? 'current-page' : ''}>
+                            Join Community
+                        </MenuItem>
+                    </Link>
                 </Box>
 
                 {/* User Menu */}
