@@ -9,6 +9,7 @@ import { Context as InboxContext } from "@/context/InboxContext";  // Import Inb
 
 import { TrackCard } from "@/components/Track/TrackCard";
 import PageSpinner from "@/components/spinners/PageSpinner";
+import { TrackCardSkeleton } from "@/components/Track/TrackCardSkeleton";
 
 export default function UserProfile() {
     const { state: authState, fetchOtherUserProfile } = useContext(AuthContext);
@@ -120,16 +121,15 @@ export default function UserProfile() {
             {/* Message Form (Visible when the 'Message' button is clicked) */}
             {isMessageFormVisible && user && (
                 <div className="mt-4 w-full">
-                    <h2 className="text-white text-lg">Compose message to {user.email}</h2>
                     <textarea
-                        className="w-full p-2 border border-gray-300 rounded-lg"
+                        className="w-full p-2 rounded-lg bg-black/[.8] color-white"
                         placeholder="Type your message..."
                         value={messageText}
                         onChange={(e) => setMessageText(e.target.value)}
                         rows="4"
                     />
                     <button
-                        className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500"
+                        className="bg-gradient-to-r from-blue-600 to-indigo-700 p-2 rounded-lg"
                         onClick={handleSendMessage}
                         disabled={isSending}
                     >
@@ -142,7 +142,7 @@ export default function UserProfile() {
             {user && (
                 <div className="mt-8">
                     <h1 className="text-white text-center text-2xl mb-8">Favorited Tracks</h1>
-
+                    {trackState.loading && <TrackCardSkeleton />}
                     {trackState.visitedUserFavoriteTracks?.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
                             {trackState.visitedUserFavoriteTracks.map((track) => (

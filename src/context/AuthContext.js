@@ -100,8 +100,8 @@ const register = (dispatch) => async ({ email, password }) => {
         const { token, profileAvatar, name, userId, favorites } = response.data;
 
         // Store user data in cookies
-        Cookies.set('authToken', token, { expires: 7, path: '/', secure: true, sameSite: 'Strict' });
-        Cookies.set('userEmail', email, { expires: 7, path: '/', sameSite: 'Strict' });
+        Cookies.set('authToken', token, { expires: 1, path: '/', secure: true, sameSite: 'Strict' });
+        Cookies.set('userEmail', email, { expires: 1, path: '/', sameSite: 'Strict' });
 
         // Dispatch register action with token and empty user data (favorites should be empty initially)
         dispatch({
@@ -129,8 +129,8 @@ const signIn = (dispatch) => async ({ email, password }) => {
             throw new Error('Email not returned from the server');
         }
         // Store user data in cookies
-        Cookies.set('authToken', token, { expires: 7, path: '/', sameSite: 'Strict' });
-        Cookies.set('userEmail', email, { expires: 7, path: '/', sameSite: 'Strict' });
+        Cookies.set('authToken', token, { expires: 1, path: '/', sameSite: 'Strict' });
+        Cookies.set('userEmail', email, { expires: 1, path: '/', sameSite: 'Strict' });
         // Dispatch sign_in action with token and userData (following the same structure as loadTokenAndUser)
         dispatch({
             type: 'sign_in',

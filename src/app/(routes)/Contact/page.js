@@ -13,35 +13,65 @@ export default function Contact() {
     });
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e) => {
+    // Handles form submission to Formspree
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
-        // Encode the form data
-        const subject = encodeURIComponent(`Contact from ${formData.name}`);
-        const body = encodeURIComponent(`
-            Name: ${formData.name}
-            Email: ${formData.email}
-            Message: ${formData.message}
-        `);
+        try {
+            const response = await fetch('https://formspree.io/f/mjkkqrlv', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
 
-        const mailtoLink = `mailto:codymoto122@gmail.com?subject=${subject}&body=${body}`;
-
-        // Open the mail client
-        window.location.href = mailtoLink;
-
-        // Optionally show a success message after opening the mail client
-        toast.success('Your message is ready to send!', {
-            position: "top-center",
-            autoClose: 1000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: true,
-            theme: "dark",
-        });
-
-        // Reset form data
-        setFormData({ name: '', email: '', message: '' });
+            if (response.ok) {
+                toast.success("Message sent! We'll get back to you shortly.", {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    theme: "dark",
+                    style: {
+                        width: '600px'
+                    }
+                });
+                setFormData({ name: '', email: '', message: '' });
+            } else {
+                toast.error('Failed to send the message. Please try again later.', {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    theme: "dark",
+                    style: {
+                        width: '600px'
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            toast.error('Something went wrong. Please try again later.', {
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                theme: "dark",
+                style: {
+                    width: '600px'
+                }
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

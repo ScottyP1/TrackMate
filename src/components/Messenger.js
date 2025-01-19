@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Context as InboxContext } from '@/context/InboxContext';
 import { Context as AuthContext } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Messenger({ conversationId }) {
     const { state: InboxState, fetchMessage, sendMessage } = useContext(InboxContext);
@@ -42,24 +43,43 @@ export default function Messenger({ conversationId }) {
 
     const otherUserEmail = selectedMessage.length > 0 ? (selectedMessage[0]?.senderId?.email !== AuthState.user?.email ? selectedMessage[0]?.senderId?.email : selectedMessage[0]?.receiverId?.email) : null;
     const otherUserName = otherUserEmail ? (selectedMessage[0]?.senderId?.email === otherUserEmail ? selectedMessage[0]?.senderId?.name : selectedMessage[0]?.receiverId?.name) : "Unknown";
-
+    const otherUserAvatar = otherUserEmail ? (selectedMessage[0]?.senderId?.email === otherUserEmail ? selectedMessage[0]?.senderId?.profileAvatar : selectedMessage[0]?.receiverId?.profileAvatar) : "Unknown";
+    const otherUserLink = otherUserEmail ? (selectedMessage[0]?.senderId?.email === otherUserEmail ? selectedMessage[0]?.senderId?._id : selectedMessage[0]?.receiverId?._id) : "Unknown";
     return (
         <div className="relative flex flex-col bg-gradient-to-b from-black via-transparent to-transparent p-4 h-full">
             <div className="flex-grow overflow-auto">
                 {/* Display the other person's name */}
-                <h1 className="text-4xl font-semibold text-center text-white mb-6 animate-fade-in">
+                <Link href={`/Account/${otherUserLink}`}> {/* Add Link to user's profile */}
+                    <img
+                        src={otherUserAvatar || '/default-avatar.png'} // Fallback to default avatar if no avatar is found
+                        alt={otherUserName || 'User'}
+                        className="w-10 h-10 rounded-full border-2 border-gray-700 mx-auto"
+                    />
+                </Link>
+                <h1 className="text-2xl font-semibold text-center text-white mb-6 animate-fade-in">
                     {otherUserName}
                 </h1>
 
                 {/* Message list */}
-                <div className="space-y-4 bg-black/50 rounded-xl p-6 mb-24 overflow-y-scroll max-h-[70vh]">
+                <div className="space-y-4 bg-black/50 rounded-xl p-6 mb-24 overflow-y-scroll min-h-[75vh]">
                     {selectedMessage.map((msg) => {
                         const isCurrentUserMessage = msg.senderId.email.toLowerCase() === AuthState.user?.email?.toLowerCase();
+                        const sender = isCurrentUserMessage ? AuthState.user : msg.senderId;
+
                         return (
                             <div
                                 key={msg._id}
-                                className={`flex items-start space-x-4 w-full ${isCurrentUserMessage ? 'justify-end' : ''}`}
+                                className={`flex items-start w-full ${isCurrentUserMessage ? 'justify-end' : ''}`}
                             >
+                                {/* User Avatar */}
+                                <div className={`flex-shrink-0 ${isCurrentUserMessage ? 'order-last ml-3' : 'order-first mr-3'}`}>
+                                    <img
+                                        src={sender?.profileAvatar || '/default-avatar.png'} // Fallback to default avatar if no avatar is found
+                                        alt={sender?.name || 'User'}
+                                        className="w-10 h-10 rounded-full border-2 border-gray-700"
+                                    />
+                                </div>
+
                                 {/* Message Bubble */}
                                 <div
                                     className={`max-w-[100%] px-5 py-3 shadow-md rounded-lg ${isCurrentUserMessage
@@ -81,7 +101,7 @@ export default function Messenger({ conversationId }) {
             </div>
 
             {/* Input field */}
-            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[95%] lg:w-[80%] p-4 flex items-center bg-gray-800 bg-opacity-80 rounded-full border-t border-neutral-600 shadow-lg">
+            <div className="absolute bottom-0 w-[95%] lg:w-[80%] left-[10px] xl:left-[140px] 2xl:left-[180px] p-4 flex items-center bg-gray-800 bg-opacity-80 rounded-full border-t border-neutral-600 shadow-lg">
                 <textarea
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}

@@ -31,9 +31,7 @@ export default function CommentItem({ comment }) {
     };
 
     const handleDeleteClick = async () => {
-        if (window.confirm('Are you sure you want to delete this comment?')) {
-            await deleteComment(comment._id);  // Call the delete action
-        }
+        await deleteComment(comment._id);  // Call the delete action
     };
 
     return (
