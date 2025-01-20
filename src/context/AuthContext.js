@@ -89,7 +89,7 @@ const loadTokenAndUser = (dispatch) => async () => {
 }
 
 // Register a new user
-const register = (dispatch) => async ({ email, password }) => {
+const register = (dispatch) => async ({ name, email, password, profileAvatar }) => {
     dispatch({ type: 'clear_error' });
     dispatch({ type: 'set_loading', payload: true });
 
@@ -97,7 +97,7 @@ const register = (dispatch) => async ({ email, password }) => {
         const body = { name, email, password, profileAvatar };
         const response = await axiosInstance.post('/auth/Register', body);
 
-        const { token, profileAvatar, name, userId, favorites } = response.data;
+        const { token, userId, favorites } = response.data;
 
         // Store user data in cookies
         Cookies.set('authToken', token, { expires: 1, path: '/', secure: true, sameSite: 'Strict' });
@@ -111,6 +111,7 @@ const register = (dispatch) => async ({ email, password }) => {
             }
         });
     } catch (e) {
+        console.log(e.message)
         dispatch({ type: 'add_error', payload: 'Something went wrong during registration' });
     } finally {
         dispatch({ type: 'set_loading', payload: false });
