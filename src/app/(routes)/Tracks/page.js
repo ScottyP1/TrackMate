@@ -20,7 +20,7 @@ export default function Tracks() {
         } else {
             fetchTracks(sanitizedSearchTerm, radius);
         }
-    };
+    }
 
     const renderTrackCardOrSkeleton = () => {
         if (state.loading) {

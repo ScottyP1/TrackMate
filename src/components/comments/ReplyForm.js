@@ -1,23 +1,27 @@
 'use client';
 import { useState, useContext } from 'react';
 import { Context as CommentContext } from '@/context/CommentContext';
+import { Context as AuthContext } from '@/context/AuthContext';
+
 import Cookies from 'js-cookie';
 
 export default function ReplyForm({ commentId }) {
     const [replyText, setReplyText] = useState('');
     const { addReply } = useContext(CommentContext);
+    const { state } = useContext(AuthContext);
 
     const handleReplySubmit = async () => {
-        const userEmail = Cookies.get('userEmail');
-        if (!userEmail) {
+        const token = Cookies.get('authToken');
+        if (!token) {
             alert('Please log in to reply.');
             return;
         }
 
         if (!replyText.trim()) return;
+        const userId = state.user.id;
 
         // Add the reply
-        await addReply(commentId, replyText, userEmail);
+        await addReply(commentId, replyText, userId);
         setReplyText('');
     };
 

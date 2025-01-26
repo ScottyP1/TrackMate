@@ -41,8 +41,8 @@ export async function PATCH(req) {
             return new Response("Email and updates are required", { status: 400 });
         }
 
-        // Validate allowed fields (name, password, favorites)
-        const allowedUpdates = ["name", "password", "favorites", "profileAvatar"];
+        // Validate allowed fields (name, password, favorites, friends, profileAvatar)
+        const allowedUpdates = ["name", "password", "favorites", "friends", "profileAvatar"];
         const keysToUpdate = Object.keys(updates);
         const isValidUpdate = keysToUpdate.every((key) => allowedUpdates.includes(key));
 
@@ -50,9 +50,13 @@ export async function PATCH(req) {
             return new Response("Invalid fields in updates", { status: 400 });
         }
 
-        // Handle favorites: Just directly assign the favorites array (no need for extraction)
+        // Handle favorites and friends updates
         if (updates.favorites && Array.isArray(updates.favorites)) {
-            updates.favorites = updates.favorites;  // Directly use the provided favorites array
+            updates.favorites = updates.favorites;
+        }
+
+        if (updates.friends && Array.isArray(updates.friends)) {
+            updates.friends = updates.friends;  // Directly use the provided friends array
         }
 
         // Fetch the user by email
@@ -62,11 +66,11 @@ export async function PATCH(req) {
             return new Response("User not found", { status: 404 });
         }
 
-        // Update the user (ignoring favorites field since we handled it separately)
+        // Update the user with the new fields (friends list will be updated as part of this)
         const updatedUser = await User.findOneAndUpdate(
             { email },
             { $set: updates },
-            { new: true, runValidators: true } // Ensure validation and return the updated document
+            { new: true, runValidators: true }
         ).exec();
 
         if (!updatedUser) {

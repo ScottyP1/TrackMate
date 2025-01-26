@@ -45,11 +45,12 @@ export async function POST(req) {
         // Return success response with token and user info
         return NextResponse.json({
             token,
-            userId: user._id,
+            _id: user._id,
             email: user.email,
             profileAvatar: user.profileAvatar,
             name: user.name,
-            favorites: user.favorites || []  // Ensure favorites is returned (empty array if undefined)
+            favorites: user.favorites || [],
+            friends: user.friends || [] // Ensure favorites is returned (empty array if undefined)
         });
     } catch (err) {
         console.error('Error:', err);

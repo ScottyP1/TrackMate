@@ -35,6 +35,20 @@ const commentReducer = (state, action) => {
                 comments: state.comments.filter(comment => comment._id !== action.payload),
                 loading: false,
             };
+        case 'delete_reply':
+            return {
+                ...state,
+                comments: state.comments.map(comment =>
+                    comment._id === action.payload.commentId
+                        ? {
+                            ...comment,
+                            replies: comment.replies.filter(reply => reply._id !== action.payload.replyId),
+                        }
+                        : comment
+                ),
+                loading: false,
+            };
+
         case 'set_loading':
             return { ...state, loading: action.payload };
         case 'add_error':
@@ -54,8 +68,13 @@ const fetchComments = (dispatch) => async (trackId) => {
     dispatch({ type: 'set_loading', payload: true });
     try {
         const response = await axiosInstance.get(`/comments?trackId=${trackId}`);
-        // Ensure the response is an array
-        const comments = Array.isArray(response.data.comments) ? response.data.comments : [];
+        // Ensure the response contains the necessary fields
+        const comments = Array.isArray(response.data.comments)
+            ? response.data.comments.map(comment => ({
+                ...comment,
+                createdAt: new Date(comment.createdAt), // Parse createdAt to Date object for easier handling
+            }))
+            : [];
         dispatch({ type: 'set_comments', payload: comments });
     } catch (error) {
         dispatch({ type: 'add_error', payload: 'Error fetching comments' });
@@ -100,13 +119,13 @@ const likeComment = (dispatch) => async (commentId, userId) => {
 
 
 // Add a reply to a comment
-const addReply = (dispatch) => async (commentId, replyText, userEmail) => {
+const addReply = (dispatch) => async (commentId, replyText, userId) => {
     dispatch({ type: 'set_loading', payload: true });
     try {
         const response = await axiosInstance.patch('/comments', {
             commentId,
             text: replyText,
-            userEmail,
+            userId,
             action: 'reply',
         });
 
@@ -119,17 +138,32 @@ const addReply = (dispatch) => async (commentId, replyText, userEmail) => {
         dispatch({ type: 'add_error', payload: 'Error adding reply' });
     }
 };
-const deleteComment = (dispatch) => async (commentId) => {
+
+const deleteComment = (dispatch) => async (commentId, replyId) => {
     dispatch({ type: 'set_loading', payload: true });
     try {
-        const response = await axiosInstance.delete(`/comments?commentId=${commentId}`);
+        const url = replyId
+            ? `/comments?commentId=${commentId}&replyId=${replyId}`
+            : `/comments?commentId=${commentId}`;
+        const response = await axiosInstance.delete(url);
+
         if (response.status === 200) {
-            dispatch({ type: 'delete_comment', payload: commentId });
+            if (replyId) {
+                // Update state for replies
+                dispatch({
+                    type: 'delete_reply',
+                    payload: { commentId, replyId },
+                });
+            } else {
+                // Update state for comments
+                dispatch({ type: 'delete_comment', payload: commentId });
+            }
         }
     } catch (error) {
-        dispatch({ type: 'add_error', payload: 'Error deleting comment' });
+        dispatch({ type: 'add_error', payload: 'Error deleting comment or reply' });
     }
 };
+
 
 // Clear error messages
 const clearError = (dispatch) => () => {

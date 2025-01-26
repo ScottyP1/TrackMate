@@ -7,8 +7,10 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     profileAvatar: { type: String, default: '' },
-    favorites: { type: [String], default: [] } // New field for storing favorite track ids
-
+    favorites: { type: [String], default: [] },
+    friends: { type: [String], default: [] },
+    verificationCode: { type: Number },
+    verificationCodeExpires: { type: Date },
 });
 
 // Hash the password before saving the user
@@ -47,8 +49,6 @@ userSchema.methods.comparePassword = function (userPassword) {
         });
     });
 };
-
-
 
 // Check if the model is already defined, and only define it if it's not
 const User = mongoose.models.User || mongoose.model('User', userSchema);

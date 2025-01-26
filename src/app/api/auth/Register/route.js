@@ -1,9 +1,10 @@
+const bcrypt = require('bcrypt');
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { dbConnect } from '@/lib/db';
 import User from '@/lib/models/User';
 import validator from 'validator'; // Import validator
-const bcrypt = require('bcrypt');
+import crypto from 'crypto'; // For generating a random verification code
 
 // POST /api/auth/register
 export async function POST(req) {
@@ -33,18 +34,22 @@ export async function POST(req) {
         const user = new User({
             name,
             email: sanitizedEmail,
-            password: password, // Save the hashed password
+            password, // The password will be hashed by the schema
             profileAvatar,
-            favorites: []
+            favorites: [],
+            friends: [],
+            verificationCode: null, // Store the generated code
+            verificationCodeExpires: null, // Set the expiration time for the code
         });
 
+        // Save the user to the database
         await user.save();
 
         // Generate JWT token after the user is created
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         // Return success response with token and user info
-        return NextResponse.json({ token, userId: user._id });
+        return NextResponse.json({ token, _id: user._id });
     } catch (err) {
         console.error('Error during registration:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });

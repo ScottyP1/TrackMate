@@ -89,7 +89,7 @@ export default function Register() {
 
         try {
             // Perform the registration action
-            await register({
+            register({
                 name: data.name.trim(),
                 email: data.email.trim().toLowerCase(), // Ensure email is sanitized
                 password: data.password,
@@ -181,7 +181,7 @@ export default function Register() {
                         )}
                         <button
                             type="submit"
-                            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-200 relative flex justify-center items-center"
+                            className={`w-full py-3 min-h-[50px] bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-200 relative flex justify-center items-center ${state.loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={state.loading}
                         >
                             {state.loading ? (

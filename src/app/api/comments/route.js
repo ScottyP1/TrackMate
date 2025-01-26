@@ -33,6 +33,7 @@ export async function GET(req) {
 
 export async function PATCH(req) {
     const { commentId, userId, action, text, replyUserName } = await req.json();
+
     if (!commentId || !userId || !action) {
         return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
     }
@@ -101,14 +102,12 @@ export async function PATCH(req) {
 }
 
 
-
-
-
 export async function POST(req) {
     try {
         const { text, trackId, userId } = await req.json();
 
         if (!text || !trackId || !userId) {
+            console.log('1')
             return new Response("Missing required fields", { status: 400 });
         }
 
@@ -138,6 +137,7 @@ export async function POST(req) {
 export async function DELETE(req) {
     const { searchParams } = new URL(req.url);
     const commentId = searchParams.get("commentId");
+    const replyId = searchParams.get("replyId");
 
     if (!commentId) {
         return new Response("Comment ID is required", { status: 400 });
@@ -146,20 +146,40 @@ export async function DELETE(req) {
     try {
         await dbConnect();
 
-        // Find and delete the comment by ID
-        const deletedComment = await Comment.findByIdAndDelete(commentId);
+        if (replyId) {
+            // Find the parent comment
+            const comment = await Comment.findById(commentId);
+            if (!comment) {
+                return new Response("Comment not found", { status: 404 });
+            }
 
-        if (!deletedComment) {
-            return new Response("Comment not found", { status: 404 });
+            // Remove the reply from the replies array
+            const replyIndex = comment.replies.findIndex(reply => reply._id.toString() === replyId);
+            if (replyIndex === -1) {
+                return new Response("Reply not found", { status: 404 });
+            }
+
+            comment.replies.splice(replyIndex, 1);
+            await comment.save();
+
+            return new Response(JSON.stringify({ message: "Reply deleted successfully" }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+            });
+        } else {
+            // Delete the entire comment if replyId is not provided
+            const deletedComment = await Comment.findByIdAndDelete(commentId);
+            if (!deletedComment) {
+                return new Response("Comment not found", { status: 404 });
+            }
+
+            return new Response(JSON.stringify({ message: "Comment deleted successfully" }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+            });
         }
-
-        return new Response(JSON.stringify({ message: "Comment deleted successfully" }), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-        });
     } catch (error) {
-        console.error("Error deleting comment:", error);
-        return new Response("Failed to delete comment", { status: 500 });
+        console.error("Error deleting comment or reply:", error);
+        return new Response("Failed to delete comment or reply", { status: 500 });
     }
 }
-

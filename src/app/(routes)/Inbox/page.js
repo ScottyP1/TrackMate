@@ -39,7 +39,7 @@ export default function InboxPage() {
 
 
     return (
-        <div className="mx-auto mt-16 bg-gradient-to-b from-black/[.8] via-transparent to-transparent relative p-12 shadow-xl">
+        <div className="mx-auto mt-16 bg-black relative p-12">
             <div className="h-screen">
                 <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center text-white mb-6 tracking-tight animate-fade-in">
                     Inbox
@@ -55,7 +55,7 @@ export default function InboxPage() {
                             return (
                                 <div
                                     key={conversation.conversationId} // Unique key per conversation
-                                    className="bg-gradient-to-t transition-all transform hover:translate-y-[-5px] hover:shadow-2xl hover:border-blue-500 duration-300 from-black/[.7] via-transparent to-transparent shadow-2xl flex items-center space-x-4 p-4 rounded-lg border-2 border-blue-300"
+                                    className="border-2 rounded-lg hover:bg-blue-500 transition-all transform hover:translate-y-[-5px] hover:shadow-2xl hover:border-blue-500 duration-300 shadow-2xl flex items-center space-x-4 p-4 rounded-lg"
                                 >
                                     {/* Show sender's avatar from the first message */}
                                     <Image
@@ -68,7 +68,7 @@ export default function InboxPage() {
 
                                     <div className="flex-grow">
                                         <Link href={`/Inbox/${conversation.conversationId}`}>
-                                            <div className="font-semibold">{conversation.receiver.name}</div>
+                                            <div className="font-semibold">{conversation.sender.name}</div>
                                             <div className="text-gray-500 text-sm mt-1">
                                                 {/* Render the latest message in the conversation */}
                                                 {conversation.messages && conversation.messages.length > 0 &&
@@ -80,7 +80,7 @@ export default function InboxPage() {
                             );
                         })
                     ) : (
-                        <div className="mt-16 text-center">No conversations available.</div>
+                        <div className="text-center">No messages yet</div>
                     )}
                 </div>
             </div>

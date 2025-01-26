@@ -9,7 +9,9 @@ import { redirect } from 'next/navigation';
 
 import { TrackCard } from "@/components/Track/TrackCard";
 import { TrackCardSkeleton } from "@/components/Track/TrackCardSkeleton";  // Import TrackCardSkeleton
+import FriendCard from "@/components/FriendCard";
 import AvatarList from "@/components/AvatarList";
+
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -20,6 +22,7 @@ export default function Account() {
     const { state: trackState, fetchFavoriteTracks } = useContext(TrackContext);
     const [formData, setFormData] = useState({ name: '', email: '', profileAvatar: '' });
     const [menu, setMenu] = useState(false);
+    const [selectedTab, setSelectedTab] = useState("favorites");  // New state to track selected tab
 
     // Fetch favorite tracks if the user has favorites
     useFetchUserAccount();
@@ -45,7 +48,6 @@ export default function Account() {
             }
         }
     }, [authState.user]);  // Run the effect when authState changes
-
 
     const onSelect = (avatar) => {
         const cleanedPath = avatar.src
@@ -101,21 +103,30 @@ export default function Account() {
                             </button>
                         </div>
 
-                        {/* User Info */}
-                        <div className="flex flex-col items-center ">
-                            <h2 className="text-white text-md md:text-2xl font-semibold">{formData.name}</h2>
-                            <p className="text-gray-400 text-sm md:text-xl email-truncate">{formData.email}</p>
+                        {/* Friends */}
+                        <div
+                            onClick={() => setSelectedTab("friends")}
+                            className={`flex flex-col items-center cursor-pointer ${selectedTab === "friends" ? "text-blue-500" : "text-white"}`}
+                        >
+                            <h2 className="text-md md:text-2xl font-semibold">Friends</h2>
+                            <p className="text-gray-400 text-sm md:text-xl">{authState.user?.friends?.length}</p>
                         </div>
 
                         {/* Fav Tracks */}
-                        <div className="flex flex-col items-center ">
-                            <h2 className="text-white text-md md:text-2xl font-semibold">Favorites</h2>
+                        <div
+                            onClick={() => setSelectedTab("favorites")}
+                            className={`flex flex-col items-center cursor-pointer ${selectedTab === "favorites" ? "text-blue-500" : "text-white"}`}
+                        >
+                            <h2 className="text-md md:text-2xl font-semibold">Favorites</h2>
                             <p className="text-gray-400 text-sm md:text-xl">{authState.user?.favorites?.length}</p>
                         </div>
 
                         {/* Posted Tracks */}
-                        <div className="flex flex-col items-center ">
-                            <h2 className="text-white text-md md:text-2xl font-semibold">Owned</h2>
+                        <div
+                            onClick={() => setSelectedTab("owned")}
+                            className={`flex flex-col items-center cursor-pointer ${selectedTab === "owned" ? "text-blue-500" : "text-white"}`}
+                        >
+                            <h2 className="text-md md:text-2xl font-semibold">Owned</h2>
                             <p className="text-gray-400 text-sm md:text-xl">0</p>
                         </div>
                     </div>
@@ -163,29 +174,55 @@ export default function Account() {
                 </form>
             }
 
-            {/* Favorite Tracks Section */}
-            {authState.user &&
-                <div className="mt-8">
-                    <h1 className="text-white text-center text-2xl mb-8">Favorited Tracks</h1>
+            {/* Content based on selected tab */}
+            <div className="mt-8">
+                {selectedTab === "favorites" && (
+                    <>
+                        <h1 className="text-white text-center text-2xl mb-8">Favorited Tracks</h1>
+                        {trackState.loading ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                {Array(4).fill(null).map((_, index) => (
+                                    <TrackCardSkeleton key={index} />
+                                ))}
+                            </div>
+                        ) : trackState.favoriteTracks?.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
+                                {trackState.favoriteTracks.map((track) => (
+                                    <TrackCard key={track.id} track={track} />
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-white text-center mt-4">You don't have any favorite tracks yet.</p>
+                        )}
+                    </>
+                )}
 
-                    {trackState.loading ? (
-                        // Show skeleton cards while loading
+                {selectedTab === "friends" && (
+                    <>
+                        <h1 className="text-white text-center text-2xl mb-8">Friends List</h1>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {Array(4).fill(null).map((_, index) => (
-                                <TrackCardSkeleton key={index} />
-                            ))}
+                            {authState.user?.friends?.length ? (
+                                authState.user.friends.map((friend, index) => (
+                                    <FriendCard
+                                        key={index}
+                                        friend={friend}
+                                    />
+                                ))
+                            ) : (
+                                <p className="text-white text-center mt-4">You don't have any friends yet.</p>
+                            )}
                         </div>
-                    ) : trackState.favoriteTracks?.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
-                            {trackState.favoriteTracks.map((track) => (
-                                <TrackCard key={track.id} track={track} />
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="text-white text-center mt-4">You don't have any favorite tracks yet.</p>
-                    )}
-                </div>
-            }
+                    </>
+                )}
+
+
+                {selectedTab === "owned" && (
+                    <>
+                        <h1 className="text-white text-center text-2xl mb-8">Owned Tracks</h1>
+                        <p className="text-white text-center mt-4">No owned tracks yet.</p>
+                    </>
+                )}
+            </div>
         </div>
     );
 }

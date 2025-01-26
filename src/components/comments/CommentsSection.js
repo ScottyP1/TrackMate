@@ -16,7 +16,7 @@ export default function CommentsSection({ trackId }) {
     // Fetch comments when the component is mounted or the trackId changes
     useEffect(() => {
         fetchComments(trackId); // Fetch comments for the current trackId
-    }, [trackId, state.comments.length]); // Only re-run when trackId changes
+    }, [trackId, state.comments.length, state.comments.replies]); // Only re-run when trackId changes
 
     const handleCommentSubmit = () => {
         const token = Cookies.get('authToken');
@@ -26,13 +26,11 @@ export default function CommentsSection({ trackId }) {
         }
 
         if (!newCommentText.trim()) return;
-
         // Call the addComment action to update the state
         addComment(trackId, newCommentText, AuthState.user.id);
         setNewCommentText('');
         setErrorMessage('');
     };
-
 
     // Ensure state.comments is always an array before mapping over it
     const comments = Array.isArray(state.comments) ? state.comments : [];
@@ -63,12 +61,11 @@ export default function CommentsSection({ trackId }) {
             {state.errorMessage && <p className="text-center text-red-500 mt-4">{state.errorMessage}</p>}
 
             {/* Comment List */}
-            <div className="mt-8 space-y-6">
+            <div className="mt-8 space-y-6 p-4 rounded-lg">
                 {comments.length > 0 ? (
                     comments.map((comment, index) => {
                         // Make sure comment is not undefined and has an _id
                         if (!comment || !comment._id) {
-                            console.warn(`Comment at index ${index} is missing _id`, comment);
                             return null; // Skip rendering this comment
                         }
                         return <CommentItem key={comment._id} comment={comment} />;

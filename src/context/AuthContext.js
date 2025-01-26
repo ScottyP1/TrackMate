@@ -14,19 +14,6 @@ const authReducer = (state, action) => {
         case 'set_loading':
             return { ...state, loading: action.payload };
 
-        case 'fetch_user':
-            return {
-                ...state,
-                user: {
-                    ...action.payload.user,  // Merge any existing user data
-                    id: action.payload._id,
-                    name: action.payload.name,
-                    email: action.payload.email,
-                    profileAvatar: action.payload.profileAvatar,
-                    favorites: action.payload.favorites || []
-                }
-            };
-
         case 'fetch_other_user':
             return { ...state, visitedUser: action.payload };
 
@@ -42,7 +29,8 @@ const authReducer = (state, action) => {
                     name: action.payload.userData.name,
                     email: action.payload.userData.email,
                     profileAvatar: action.payload.userData.profileAvatar,
-                    favorites: action.payload.userData.favorites || []  // Safe fallback for favorites
+                    favorites: action.payload.userData.favorites || [],
+                    friends: action.payload.userData.friends || []  // Safe fallback for favorites
                 }
             };
 
@@ -61,7 +49,8 @@ const authReducer = (state, action) => {
                 user: {
                     ...state.user,
                     ...action.payload,  // Update user profile with new data
-                    favorites: action.payload.favorites || state.user.favorites || []
+                    favorites: action.payload.favorites || state.user.favorites || [],
+                    friends: action.payload.friends || state.user.friends
                 }
             };
 
@@ -78,6 +67,7 @@ const loadTokenAndUser = (dispatch) => async () => {
         try {
             const response = await axiosInstance.get(`/Account?email=${userEmail}`)
             const userData = response.data.user;
+
             // Now dispatch sign_in with token and complete user data
             dispatch({ type: 'sign_in', payload: { token, userData } });
         }
@@ -96,8 +86,7 @@ const register = (dispatch) => async ({ name, email, password, profileAvatar }) 
     try {
         const body = { name, email, password, profileAvatar };
         const response = await axiosInstance.post('/auth/Register', body);
-
-        const { token, userId, favorites } = response.data;
+        const { token, _id, favorites } = response.data;
 
         // Store user data in cookies
         Cookies.set('authToken', token, { expires: 1, path: '/', secure: true, sameSite: 'Strict' });
@@ -107,11 +96,10 @@ const register = (dispatch) => async ({ name, email, password, profileAvatar }) 
         dispatch({
             type: 'sign_in',
             payload: {
-                token, userData: { userId, name, email, profileAvatar, favorites }
+                token, userData: { _id, name, email, profileAvatar, favorites }
             }
         });
     } catch (e) {
-        console.log(e.message)
         dispatch({ type: 'add_error', payload: 'Something went wrong during registration' });
     } finally {
         dispatch({ type: 'set_loading', payload: false });
@@ -125,7 +113,8 @@ const signIn = (dispatch) => async ({ email, password }) => {
 
     try {
         const response = await axiosInstance.post('/auth/Login', { email, password });
-        const { token, profileAvatar, name, userId, favorites } = response.data;
+        const { token, profileAvatar, name, id, favorites } = response.data;
+
         if (!response.data.email) {
             throw new Error('Email not returned from the server');
         }
@@ -136,7 +125,7 @@ const signIn = (dispatch) => async ({ email, password }) => {
         dispatch({
             type: 'sign_in',
             payload: {
-                token, userData: { userId, name, email, profileAvatar, favorites }
+                token, userData: { id, name, email, profileAvatar, favorites }
             }
         });
     } catch (e) {
@@ -162,7 +151,7 @@ const fetchOtherUserProfile = (dispatch) => async (user) => {
     }
 };
 
-// Update user information (like profile, email, etc.)
+
 const updateUser = (dispatch) => async ({ email, updates }) => {
     dispatch({ type: "set_loading", payload: true });
     try {
