@@ -113,7 +113,7 @@ const signIn = (dispatch) => async ({ email, password }) => {
 
     try {
         const response = await axiosInstance.post('/auth/Login', { email, password });
-        const { token, profileAvatar, name, id, favorites } = response.data;
+        const { token, profileAvatar, name, _id, favorites } = response.data;
 
         if (!response.data.email) {
             throw new Error('Email not returned from the server');
@@ -125,7 +125,7 @@ const signIn = (dispatch) => async ({ email, password }) => {
         dispatch({
             type: 'sign_in',
             payload: {
-                token, userData: { id, name, email, profileAvatar, favorites }
+                token, userData: { _id, name, email, profileAvatar, favorites }
             }
         });
     } catch (e) {

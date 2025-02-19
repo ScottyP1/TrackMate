@@ -15,7 +15,7 @@ import Avatar from '@mui/material/Avatar';
 import { Context as AuthContext } from '@/context/AuthContext';
 import useFetchUserAccount from '@/hooks/useFetchUserAccount';
 
-const pages = ['Home', 'Tracks', 'About', 'Contact'];
+const pages = ['Home', 'Tracks', 'About', 'Contact', 'Terms'];
 
 function NavBar() {
     const [menuAnchor, setMenuAnchor] = React.useState(null);
@@ -162,11 +162,6 @@ function NavBar() {
                                 <Link href="/PrivateTrack">
                                     <MenuItem onClick={() => handleUserMenuClose()}>
                                         Private Track
-                                    </MenuItem>
-                                </Link>
-                                <Link href="/Inbox">
-                                    <MenuItem onClick={() => handleUserMenuClose()}>
-                                        Inbox
                                     </MenuItem>
                                 </Link>
                                 <MenuItem onClick={handleSignOut}>Log out</MenuItem>

@@ -1,30 +1,18 @@
-'use client';
 import { useState } from "react";
 import axiosInstance from "@/api/axios";
 import { FaUserCircle } from "react-icons/fa"; // User icon library
-import Cookies from "js-cookie";
 
 export default function CommentForm({ trackId, onCommentSubmit }) {
     const [commentText, setCommentText] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [showForm, setShowForm] = useState(false);
 
-    const handleCommentSubmit = async (event) => {
-        event.preventDefault();
-
-        const token = Cookies.get('authToken');
-        const userEmail = Cookies.get('userEmail');
-
-        if (!token || !userEmail) {
-            setErrorMessage('You must be logged in to commentt.');
-            return;
-        }
-
+    const handleCommentSubmit = async () => {
         try {
             const response = await axiosInstance.post('/comments', { text: commentText, trackId, userEmail });
             setCommentText('');
             setErrorMessage('');
-            setShowForm(false); // Hide form after submitting
+            setShowForm(false);
             onCommentSubmit(response.data);
         } catch (error) {
             console.error('Error submitting comment:', error);

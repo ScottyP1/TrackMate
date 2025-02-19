@@ -9,11 +9,15 @@ import ninja from 'public/Avatars/ninja.png';
 import panda from 'public/Avatars/panda.png';
 import racer from 'public/Avatars/racer.png';
 import shark from 'public/Avatars/shark.png';
+import alien from 'public/Avatars/alien.png';
+import grandma from 'public/Avatars/grandma.png';
+import pilot from 'public/Avatars/pilot.png';
+import pimp from 'public/Avatars/pimp.png';
 
 export default function AvatarList({ onSelect, classes }) {
     const [selectedAvatar, setSelectedAvatar] = useState(null); // Track selected avatar
 
-    const images = [dino, dirtbike, duck, monster, ninja, panda, racer, shark];
+    const images = [dino, dirtbike, duck, monster, ninja, panda, racer, shark, alien, grandma, pilot, pimp];
 
     const handleSelect = (image) => {
         setSelectedAvatar(image); // Update local state
