@@ -15,7 +15,7 @@ import Avatar from '@mui/material/Avatar';
 import { Context as AuthContext } from '@/context/AuthContext';
 import useFetchUserAccount from '@/hooks/useFetchUserAccount';
 
-const pages = ['Home', 'Tracks', 'About', 'Contact', 'Terms'];
+const pages = ['Home', 'Tracks', 'About', 'Contact'];
 
 function NavBar() {
     const [menuAnchor, setMenuAnchor] = React.useState(null);
