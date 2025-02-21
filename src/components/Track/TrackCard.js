@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { MdFavorite, MdOutlineFavoriteBorder } from "react-icons/md";
 
 export const TrackCard = ({ track }) => {
-    const { isFavorite, handleFavoriteClick } = useFavorite(track.placeId);
+    // const { isFavorite, handleFavoriteClick } = useFavorite(track.placeId);
 
     return (
         <div className="bg-gradient-to-br from-blue via-black/[.8] to-black/[.3] rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
@@ -36,21 +36,21 @@ export const TrackCard = ({ track }) => {
                 <p className="text-gray-300 text-sm mt-1">{track.location}</p>
 
                 {/* Rating and Favorite Button */}
-                <div className="text-yellow-300 font-semibold flex justify-between items-center mt-3">
-                    <span>Rating: {track.rating || 'N/A'}</span>
+                {/* <div className="text-yellow-300 font-semibold flex justify-between items-center mt-3">
+                    <span>Rating: {track.rating || 'N/A'}</span> */}
 
-                    {/* Favorite Button (Larger for Mobile) */}
-                    <button
+                {/* Favorite Button (Larger for Mobile) */}
+                {/* <button
                         className={`p-4 rounded-full ${isFavorite ? 'text-red-500' : 'text-gray-500'} hover:text-blue-300 transition-all focus:outline-none`}
                         onClick={handleFavoriteClick}
                         aria-label="Favorite Track"
-                    >
-                        {isFavorite ?
+                    > */}
+                {/* {isFavorite ?
                             <MdFavorite size={30} />
                             : <MdOutlineFavoriteBorder size={30} />
-                        }
-                    </button>
-                </div>
+                        } */}
+                {/* </button>
+                </div> */}
             </div>
         </div>
     );

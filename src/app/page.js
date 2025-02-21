@@ -5,7 +5,7 @@ import useFetchUserAccount from '@/hooks/useFetchUserAccount';
 
 
 export default function Home() {
-  useFetchUserAccount();
+  // useFetchUserAccount();
   return (
     <div className="relative w-full text-center bg-black">
       <div className="absolute top-0 homeBG bg-cover bg-center"></div>

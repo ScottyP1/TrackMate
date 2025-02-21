@@ -19,24 +19,24 @@ const pages = ['Home', 'Tracks', 'About', 'Contact', 'Terms'];
 
 function NavBar() {
     const [menuAnchor, setMenuAnchor] = React.useState(null);
-    const [userMenuAnchor, setUserMenuAnchor] = React.useState(null);
-    const { state, signOut } = React.useContext(AuthContext);
+    // const [userMenuAnchor, setUserMenuAnchor] = React.useState(null);
+    // const { state, signOut } = React.useContext(AuthContext);
     const pathname = usePathname();
 
-    useFetchUserAccount();
+    // useFetchUserAccount();
 
     const handleMenuOpen = (event) => setMenuAnchor(event.currentTarget);
     const handleMenuClose = () => setMenuAnchor(null);
-    const handleUserMenuOpen = (event) => setUserMenuAnchor(event.currentTarget);
-    const handleUserMenuClose = () => setUserMenuAnchor(null);
+    // const handleUserMenuOpen = (event) => setUserMenuAnchor(event.currentTarget);
+    // const handleUserMenuClose = () => setUserMenuAnchor(null);
     const getPagePath = (page) => (page === 'Home' ? '/' : `/${page}`);
     const isActivePage = (page) => pathname === getPagePath(page);
 
     // Handle sign-out and redirection
-    const handleSignOut = () => {
-        signOut();  // Sign out logic
-        handleUserMenuClose();  // Close user menu
-    };
+    // const handleSignOut = () => {
+    //     signOut();  // Sign out logic
+    //     handleUserMenuClose();  // Close user menu
+    // };
     return (
         <AppBar position="fixed" sx={{ backgroundColor: 'rgba(0, 0, 0, 0.70)', zIndex: 10 }}>
             <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 65, px: 2 }}>
@@ -125,7 +125,7 @@ function NavBar() {
                 </Box>
 
                 {/* User Menu */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                {/* <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <a href="https://www.buymeacoffee.com/TrackMate" className="hidden md:block ">
                         <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a RedBull&emoji=🤟🏻&slug=TrackMate&button_colour=5F7FFF&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00" />
                     </a>
@@ -168,7 +168,7 @@ function NavBar() {
                             </Menu>
                         </>
                     )}
-                </Box>
+                </Box> */}
             </Toolbar>
         </AppBar >
     );

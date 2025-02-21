@@ -27,7 +27,7 @@ const TrackDetailsPage = () => {
     }, [state.track, state.errorMessage]);
 
     const track = state.track;
-    const { isFavorite, handleFavoriteClick } = useFavorite(placeId);
+    // const { isFavorite, handleFavoriteClick } = useFavorite(placeId);
 
     // If no track found, render NotFound component
     if (!track) {
@@ -57,12 +57,12 @@ const TrackDetailsPage = () => {
                     </p>
 
                     {/* Add to favorites button */}
-                    <button
+                    {/* <button
                         className={`mt-4 px-6 py-2 rounded-full ${isFavorite ? 'bg-red-500' : 'bg-gray-700'} text-white font-semibold`}
                         onClick={handleFavoriteClick}
                     >
                         {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
-                    </button>
+                    </button> */}
                 </div>
 
                 {/* Image carousel */}
@@ -71,7 +71,7 @@ const TrackDetailsPage = () => {
                 )}
 
                 {/* Comments Section */}
-                <CommentsSection trackId={track.id} />
+                {/* <CommentsSection trackId={track.id} /> */}
             </div>
         </div>
     );
