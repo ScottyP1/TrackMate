@@ -74,7 +74,7 @@ export default function Header() {
 
 
                 {/* Find Riders */}
-                <Link href="/Tracks" aria-label="Find Local Riders">
+                <Link href="/TrackMateApp" aria-label="Find Local Riders">
                     <div className="text-center group relative bg-gradient-to-b from-black/[.7] via-transparent to-black shadow-2xl rounded-lg border border-green-500 p-6 transition-all transform hover:translate-y-[-5px] hover:shadow-2xl hover:border-green-500 duration-300 flex justify-center items-center">
                         <div className="flex flex-col items-center justify-center">
                             {/* Icon and Title Row */}
