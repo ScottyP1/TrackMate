@@ -25,7 +25,7 @@ export default function Header() {
                 {/* Button Section */}
                 <div className="flex justify-center gap-6 mt-8 animate-fade-in-delay-3">
                     {/* Get Started Button */}
-                    <Link href="/Register">
+                    <Link href="/Tracks">
                         <button
                             aria-label="Get Started with Trackmate"
                             className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold rounded-full transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30 transition-all focus:ring-2 focus:ring-blue-500 flex items-center justify-center gap-2"
