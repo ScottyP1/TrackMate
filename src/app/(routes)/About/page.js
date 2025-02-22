@@ -42,26 +42,9 @@ export default function About() {
                 <div className="mb-12">
                     <h2 className="text-3xl font-semibold text-white mb-6">Join Us</h2>
                     <p className="text-lg text-gray-300 mb-8">
-                        Ready to explore the best tracks near you? Sign up today to get started, or log in to submit your own track and share your adventures with the community. Whether you're a seasoned adventurer or a beginner, TrackMate is the place to find new tracks and meet like-minded riders.
+                        Ready to explore the best tracks near you? Download our App today to get started, or submit your own track and share your adventures with the community. Whether you're a seasoned adventurer or a beginner, TrackMate is the place to find new tracks and meet like-minded riders.
                     </p>
-                    <div className="flex justify-center gap-8">
-                        <Link href="/SignUp">
-                            <button
-                                aria-label="Sign Up with TrackMate"
-                                className="px-8 py-4 bg-blue-600 text-white font-semibold rounded-full shadow-lg hover:bg-blue-700 transition-all focus:ring-2 focus:ring-blue-500"
-                            >
-                                Sign Up
-                            </button>
-                        </Link>
-                        <Link href="/SignIn">
-                            <button
-                                aria-label="Sign In with TrackMate"
-                                className="px-8 py-4 bg-transparent border-2 border-blue-500 text-blue-500 font-semibold rounded-full shadow-lg hover:bg-blue-500 hover:text-white transition-all focus:ring-2 focus:ring-blue-500"
-                            >
-                                Sign In
-                            </button>
-                        </Link>
-                    </div>
+
                 </div>
             </div>
         </div>
