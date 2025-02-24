@@ -69,7 +69,11 @@ const TrackDetailsPage = () => {
                 {track.images?.length > 0 && (
                     <ImageCarosel validImages={track.images.filter((image) => image)} />
                 )}
-
+                <div className="p-5 bg-black/50 rounded-b-xl">
+                    <h2 className="text-xs text-gray-400">
+                        Images provided by Google Places API
+                    </h2>
+                </div>
                 {/* Comments Section */}
                 {/* <CommentsSection trackId={track.id} /> */}
             </div>
