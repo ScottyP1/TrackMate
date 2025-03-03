@@ -101,7 +101,7 @@ function NavBar() {
                 {/* Desktop Navigation */}
                 <Box sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'start', alignItems: 'center', gap: 4 }}>
                     <Link href="/" passHref>
-                        <Image src={'/images/logo2.png'} width={150} height={45} alt="Logo" />
+                        <Image src={'/images/logo2.png'} width={150} height={45} alt="Logo" className='xs:ml-[55px]' />
                     </Link>
                     {pages.map((page) => {
                         const isCurrentPage =
