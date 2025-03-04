@@ -15,7 +15,7 @@ import Avatar from '@mui/material/Avatar';
 import { Context as AuthContext } from '@/context/AuthContext';
 import useFetchUserAccount from '@/hooks/useFetchUserAccount';
 
-const pages = ['Home', 'Tracks', 'About', 'Contact'];
+const pages = ['Home', 'Tracks', 'About', 'Contact', 'PrivateTrack'];
 
 function NavBar() {
     const [menuAnchor, setMenuAnchor] = React.useState(null);
@@ -72,6 +72,7 @@ function NavBar() {
                                 Join Community
                             </MenuItem>
                         </Link>
+
                         <MenuItem onClick={handleMenuClose} className="flex items-center justify-center">
                             <a
                                 href="https://www.buymeacoffee.com/TrackMate"
