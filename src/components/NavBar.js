@@ -93,7 +93,7 @@ function NavBar() {
                 </Box>
 
                 {/* Centered Logo */}
-                <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' }, justifyContent: 'center' }}>
+                <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' }, justifyContent: 'center' }} className='mr-12'>
                     <Link href="/" passHref>
                         <Image src={'/images/logo2.png'} width={160} height={100} alt="Logo" />
                     </Link>
