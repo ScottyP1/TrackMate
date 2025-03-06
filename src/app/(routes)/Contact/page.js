@@ -134,7 +134,6 @@ export default function Contact() {
                         ) : (
                             <>
                                 <span>Send Message</span>
-                                <FaPaperPlane className="h-5 w-5 transform group-hover:translate-x-2 transition-all duration-300" />
                             </>
                         )}
                     </button>
