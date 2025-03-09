@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { FaApple } from "react-icons/fa";
 
 export default function TrackMateApp() {
@@ -17,8 +18,9 @@ export default function TrackMateApp() {
             </div>
             <button className="mt-6 bg-white border-2 border-black text-black font-semibold py-8 px-8 rounded-full shadow-lg transition transform hover:scale-105 duration-300 ease-in-out flex items-center gap-3">
                 <FaApple color="black" size={30} />
-                <span>Download On The App Store</span>
+                <span className="text-center">Download On The App Store</span>
             </button>
+            <span className="text-white text-center"><Link href='/Terms' className="text-blue-500">Terms of Service</Link> and <Link href='/Terms' className="text-blue-500">Privacy Policy</Link></span>
 
         </div>
     );
