@@ -1,7 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
-export default function TermsAndPrivacy() {
+export default function Terms() {
     return (
         <div className="p-5">
             {/* Terms of Service */}
