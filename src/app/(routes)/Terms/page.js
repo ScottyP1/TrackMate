@@ -1,10 +1,8 @@
 import React from 'react';
-import Link from 'next/link';
 
 export default function Terms() {
     return (
         <div className="p-5">
-            {/* Terms of Service */}
             <div className="mt-28 mb-5">
                 <h1 className="text-2xl font-bold mb-2">TrackMate MX - Terms of Service</h1>
                 <p className="italic mb-2">Last Updated: 03/10/25</p>
@@ -68,9 +66,8 @@ export default function Terms() {
                 </p>
 
                 <h2 className="text-xl font-semibold my-1">9. Contact Us</h2>
-                <p>If you have any questions, contact us <Link to='/Contact' className="text-blue-500 underline">here</Link></p>
+                <p>If you have any questions, contact us through our contact page.</p>
 
-                {/* Privacy Policy */}
                 <h1 className="text-2xl font-bold mb-2 mt-10">TrackMate MX - Privacy Policy</h1>
                 <p className="italic mb-2">Last Updated: 03/10/25</p>
 
@@ -131,7 +128,7 @@ export default function Terms() {
                 </p>
 
                 <h2 className="text-xl font-semibold my-1">9. Contact Us</h2>
-                <p>If you have any questions, contact us at [Your Email].</p>
+                <p>If you have any questions, contact us.</p>
             </div>
         </div>
     );
