@@ -1,118 +1,168 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-export default function TermsAndPrivacy() {
+const TermsAndPrivacy = () => {
     return (
-        <div className="flex-1 bg-black p-4">
-            <h1 className="text-white text-2xl font-bold mb-4 mt-40">Terms of Service</h1>
-            <p className="text-white mb-2">
-                Welcome to our TrackMate MX! By accessing or using our services, you agree to comply with the following terms and conditions.
-            </p>
+        <div style={styles.container}>
+            {/* Terms of Service */}
+            <div style={styles.section}>
+                <h1 style={styles.header}>TrackMate MX - Terms of Service</h1>
+                <p style={styles.date}>Last Updated: 03/10/25</p>
 
-            <h2 className="text-white text-lg font-semibold mb-2">1. Acceptance of Terms</h2>
-            <p className="text-white mb-2">
-                By signing up or registering on this app, you agree to the terms outlined in this document. If you disagree with any part of these terms, you may not use our services.
-            </p>
+                <h2 style={styles.subHeader}>1. Acceptance of Terms</h2>
+                <p>
+                    By signing up or registering on this app, you agree to these Terms of Service and our Privacy Policy. If you do not agree, please do not use our services.
+                </p>
 
-            <h2 className="text-white text-lg font-semibold mb-2">2. Use of Services</h2>
-            <p className="text-white mb-2">
-                We provide an app that helps motocross riders discover tracks, connect with other riders, and manage their profile. By using our services, you agree to:
-                <br />- Use the app only for lawful purposes.
-                <br />- Not engage in any illegal activity through the use of the app.
-            </p>
+                <h2 style={styles.subHeader}>2. Use of Services</h2>
+                <p>
+                    TrackMate MX helps motocross riders discover tracks, connect with other riders, and manage their profile. By using our services, you agree to:
+                </p>
+                <ul>
+                    <li>Use the app only for lawful purposes.</li>
+                    <li>Not engage in any illegal activity through the app.</li>
+                </ul>
 
-            <h2 className="text-white text-lg font-semibold mb-2">3. User Information and Data</h2>
-            <p className="text-white mb-2">
-                When you sign up or register, we collect the following personal information:
-                <br />- Username, Email, Password, Full Name, Profile Image.
-                <br />By registering, you consent to us using your information to improve user experience and provide the services, including notifications, location-based services, and communication features.
-            </p>
+                <h2 style={styles.subHeader}>3. User Information and Data</h2>
+                <p>When you sign up or register, we collect the following personal information:</p>
+                <ul>
+                    <li>Contact Info: Email, username.</li>
+                    <li>User Content: Profile image (uploaded to Cloudinary, stored as a URL).</li>
+                    <li>Location Data: Used to find nearby tracks (only if permission is granted).</li>
+                    <li>Push Notification Token: Stored in our database to send app notifications.</li>
+                    <li>Diagnostics & Other Data: We may collect device information (e.g., OS type) to improve performance.</li>
+                </ul>
+                <p>
+                    By registering, you consent to us using your information to improve user experience and provide services such as notifications, location-based features, and communication.
+                </p>
 
-            <h2 className="text-white text-lg font-semibold mb-2">4. Location and Notifications</h2>
-            <p className="text-white mb-2">
-                We will ask for your location permission to offer personalized experiences, such as finding motocross tracks near you. You have the right to refuse location access, and this will not affect your ability to use the app.
-                <br />We will also ask for your permission to send push notifications. These notifications are used to keep you updated with important messages and features within the app.
-            </p>
+                <h2 style={styles.subHeader}>4. Location and Notifications</h2>
+                <p>
+                    Location: If you grant permission, we use your location to suggest tracks near you. You can disable this anytime in your device settings.
+                </p>
+                <p>
+                    Push Notifications: We ask for permission to send notifications. If granted, we store your push notification token in our database. You can opt out in your device settings.
+                </p>
 
-            <h2 className="text-white text-lg font-semibold mb-2">5. Third-Party Services</h2>
-            <p className="text-white mb-2">
-                We do not share your personal data with third parties, except for those who help us operate the app (e.g., email services, cloud storage). We ensure that these third parties comply with our privacy standards.
-            </p>
+                <h2 style={styles.subHeader}>5. Third-Party Services</h2>
+                <p>We do not sell your personal data. However, we use trusted third-party services to operate the app:</p>
+                <ul>
+                    <li>Cloudinary: Stores profile images securely.</li>
+                    <li>MongoDB: Stores user information securely</li>
+                </ul>
+                <p>All third-party providers comply with our privacy standards.</p>
 
-            <h2 className="text-white text-lg font-semibold mb-2">6. Changes to Terms</h2>
-            <p className="text-white mb-2">
-                We may update these terms periodically. Any changes will be communicated through the app or by email, and you are expected to review them.
-            </p>
+                <h2 style={styles.subHeader}>6. Account & Data Deletion</h2>
+                <p>
+                    You have the right to delete your account and all associated data. To request account deletion, go to the app settings and select "Delete Account." All your data will be permanently deleted.
+                </p>
 
-            <h2 className="text-white text-lg font-semibold mb-2">7. Termination</h2>
-            <p className="text-white mb-2">
-                We reserve the right to suspend or terminate your account if you violate these terms.
-            </p>
+                <h2 style={styles.subHeader}>7. Changes to Terms</h2>
+                <p>
+                    We may update these terms periodically. Any changes will be communicated through the app or by email.
+                </p>
 
-            <h1 className="text-white text-2xl font-bold mb-4 mt-8">Privacy Policy</h1>
+                <h2 style={styles.subHeader}>8. Termination</h2>
+                <p>
+                    We reserve the right to suspend or terminate your account if you violate these terms.
+                </p>
 
-            <p className="text-white mb-2">
-                At [Your App Name], we respect your privacy and are committed to protecting the information you provide. This Privacy Policy explains how we collect, use, and share your personal information.
-            </p>
+                <h2 style={styles.subHeader}>9. Contact Us</h2>
+                <p>If you have any questions, contact us <Link to="https://www.trackmatemx.com/Contact" style={styles.link}>here</Link></p>
 
-            <h2 className="text-white text-lg font-semibold mb-2">1. Information We Collect</h2>
-            <p className="text-white mb-2">
-                When you register or use our services, we collect the following information:
-                <br />- Personal Information: Name, email, password, and profile image that you provide during registration.
-                <br />- Location: If you grant permission, we collect your location to show nearby motocross tracks.
-                <br />- Device Information: We may collect data about the device you're using (e.g., device type, operating system) to improve our services.
-            </p>
+                {/* Privacy Policy */}
+                <h1 style={styles.header}>TrackMate MX - Privacy Policy</h1>
+                <p style={styles.date}>Last Updated: 03/10/25</p>
 
-            <h2 className="text-white text-lg font-semibold mb-2">2. How We Use Your Information</h2>
-            <p className="text-white mb-2">
-                We use your personal information to:
-                <br />- Provide and improve our services.
-                <br />- Personalize your experience (e.g., showing nearby tracks).
-                <br />- Send you notifications regarding app updates, new features, and messages.
-                <br />- Respond to support requests and improve customer service.
-            </p>
+                <h2 style={styles.subHeader}>1. Information We Collect</h2>
+                <p>When you register or use our services, we collect:</p>
+                <ul>
+                    <li>Contact Info: Email, username.</li>
+                    <li>User Content: Profile image (stored via Cloudinary).</li>
+                    <li>Location Data: Used to find motocross tracks near you (only if permission is granted).</li>
+                    <li>Push Notification Token: Stored to send app notifications.</li>
+                    <li>Device & Diagnostic Data: We may collect non-personal data such as device type, operating system, and crash reports to improve performance.</li>
+                </ul>
 
-            <h2 className="text-white text-lg font-semibold mb-2">3. Location Services</h2>
-            <p className="text-white mb-2">
-                If you grant us permission, we use your location to suggest tracks near you. You can revoke this permission at any time through your device settings.
-            </p>
+                <h2 style={styles.subHeader}>2. How We Use Your Information</h2>
+                <p>We use your personal information to:</p>
+                <ul>
+                    <li>Provide and improve our services.</li>
+                    <li>Personalize your experience (e.g., showing nearby tracks).</li>
+                    <li>Send notifications regarding app updates, new features, and messages.</li>
+                    <li>Respond to support requests and improve customer service.</li>
+                </ul>
 
-            <h2 className="text-white text-lg font-semibold mb-2">4. Push Notifications</h2>
-            <p className="text-white mb-2">
-                We may send you push notifications related to your account, new features, or app updates. You can opt out of these notifications at any time through your device settings.
-            </p>
+                <h2 style={styles.subHeader}>3. Location & Push Notifications</h2>
+                <p>
+                    Location: If granted, we use your location to show nearby tracks. This data is not stored and can be disabled anytime in your device settings.
+                </p>
+                <p>
+                    Push Notifications: If granted, we store your push notification token to send you updates. You can opt out anytime.
+                </p>
 
-            <h2 className="text-white text-lg font-semibold mb-2">5. Data Security</h2>
-            <p className="text-white mb-2">
-                We take reasonable measures to protect your information from unauthorized access or disclosure. However, no data transmission over the internet is 100% secure, and we cannot guarantee the absolute security of your data.
-            </p>
+                <h2 style={styles.subHeader}>4. Data Sharing</h2>
+                <p>We do not sell your data. However, we use trusted third-party services:</p>
+                <ul>
+                    <li>Cloudinary: Stores profile images securely.</li>
+                    <li>MongoDB: Stores user information securely</li>
+                </ul>
 
-            <h2 className="text-white text-lg font-semibold mb-2">6. Data Sharing</h2>
-            <p className="text-white mb-2">
-                We do not sell your personal information to third parties. However, we may share your data with trusted partners who help us operate the app, such as cloud storage providers. These partners are contractually obligated to protect your privacy.
-            </p>
+                <h2 style={styles.subHeader}>5. Data Security</h2>
+                <p>
+                    We take reasonable measures to protect your data. However, no method is 100% secure, and we cannot guarantee absolute security.
+                </p>
 
-            <h2 className="text-white text-lg font-semibold mb-2">7. Children’s Privacy</h2>
-            <p className="text-white mb-2">
-                Our app is not intended for use by children under the age of 13. We do not knowingly collect or solicit information from children under 13.
-            </p>
+                <h2 style={styles.subHeader}>6. Your Rights & Data Deletion</h2>
+                <p>You have the right to:</p>
+                <ul>
+                    <li>Access and update your personal information.</li>
+                    <li>Request account deletion and all associated data.</li>
+                </ul>
 
-            <h2 className="text-white text-lg font-semibold mb-2">8. Your Rights</h2>
-            <p className="text-white mb-2">
-                You have the right to:
-                <br />- Access and update your personal information.
-                <br />- Request the deletion of your account or data.
-                <br />- Opt out of notifications or location services.
-            </p>
+                <h2 style={styles.subHeader}>7. Children’s Privacy</h2>
+                <p>
+                    Our app is not intended for users under 17 years old. We do not knowingly collect or solicit information from children under 17.
+                </p>
 
-            <h2 className="text-white text-lg font-semibold mb-2">9. Changes to Privacy Policy</h2>
-            <p className="text-white mb-2">
-                We may update this Privacy Policy from time to time. Any changes will be reflected on this page, and we will notify you through the app or email.
-            </p>
+                <h2 style={styles.subHeader}>8. Changes to Privacy Policy</h2>
+                <p>
+                    We may update this Privacy Policy from time to time. Any changes will be reflected on this page, and we will notify you through the app or email.
+                </p>
 
-            <h2 className="text-white text-lg font-semibold mb-2">10. Contact Us</h2>
-            <p className="text-white mb-12">
-                If you have any questions or concerns about our Terms of Service or Privacy Policy, please contact us at [email address].
-            </p>
+                <h2 style={styles.subHeader}>9. Contact Us</h2>
+                <p>If you have any questions, contact us at [Your Email].</p>
+            </div>
         </div>
     );
-}
+};
+
+const styles = {
+    container: {
+        padding: '20px',
+    },
+    header: {
+        fontSize: '24px',
+        fontWeight: 'bold',
+        marginBottom: '10px',
+    },
+    date: {
+        fontStyle: 'italic',
+        marginBottom: '10px',
+    },
+    subHeader: {
+        fontSize: '18px',
+        fontWeight: '600',
+        marginVertical: '5px',
+    },
+    section: {
+        marginTop: '110px',
+        marginBottom: '20px',
+    },
+    link: {
+        color: 'blue',
+        textDecoration: 'underline',
+    },
+};
+
+export default TermsAndPrivacy;
