@@ -123,6 +123,22 @@ function NavBar() {
                             Join Community
                         </MenuItem>
                     </Link>
+                    <MenuItem onClick={handleMenuClose} className="">
+                        <a
+                            href="https://www.buymeacoffee.com/TrackMate"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block"
+                        >
+                            <img
+                                src="https://img.buymeacoffee.com/button-api/?text=BuymeaRedBull&emoji=🤟🏻&slug=TrackMate&button_colour=5F7FFF&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00"
+                                alt="Buy me a RedBull"
+                                className="rounded-md"
+                                width={200}
+                                height={50}
+                            />
+                        </a>
+                    </MenuItem>
                 </Box>
 
                 {/* User Menu */}
